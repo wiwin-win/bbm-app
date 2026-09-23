@@ -34,7 +34,7 @@
   <a data-tab="data">Data &amp; Riwayat</a>
   <a data-tab="rekap">Rekap</a>
   <a data-tab="master">Master</a>
-  <a data-tab="admin" id="tabAdmin">Admin</a>
+  <a data-tab="admin" id="tabAdmin" style="display:none">Admin</a>
   <span class="kanan">
     <button class="btn ghost sm" onclick="bukaLaporan()">Laporan / Cetak</button>
     <button class="btn ghost sm" onclick="bukaPengaturan()">Pengaturan</button>
@@ -281,7 +281,7 @@
         <div class="f"><label>Username</label><input id="uNama"></div>
         <div class="f"><label>Nama tampilan</label><input id="uTampil"></div>
         <div class="f"><label>Password</label><input id="uPass" type="password"></div>
-        <div class="f" style="max-width:140px"><label>Peran</label><select id="uRole"><option value="operator">Operator</option><option value="admin">Admin</option></select></div>
+        <div class="f" style="max-width:140px"><label>Peran</label><select id="uRole"><option value="operator">Operator</option><option value="admin">Admin</option><option value="maker">Maker</option><option value="fuelman">Fuelman</option><option value="watcher">Watcher</option></select></div>
         <button class="btn" onclick="tambahUser()">Tambah</button>
       </div>
       <table id="tblUser"></table>
@@ -711,7 +711,7 @@ async function hapusMaster(kind, id){ if(!confirm('Hapus item master ini?')) ret
 /* ---------- admin ---------- */
 async function muatAdmin(){
   const s = S.settings; $('sInstansi').value=s.nama_instansi||''; $('sHarga').value=s.harga_default||0; $('sStok').value=s.stok_awal||0;
-  if(S.user.role!=='admin'){ $('tabAdmin').innerHTML='<div class="panel">Hanya admin yang dapat membuka menu ini.</div>'; return; }
+  if(S.user.role!=='admin' && S.user.role!=='maker'){ $('tabAdmin').innerHTML='<div class="panel">Hanya admin/maker yang dapat membuka menu ini.</div>'; return; }
   const r = await api('/api/users');
   $('tblUser').innerHTML = `<thead><tr><th>Username</th><th>Nama</th><th>Peran</th><th>Status</th><th></th></tr></thead><tbody>` +
     r.rows.map(u=>`<tr><td>${esc(u.username)}</td><td>${esc(u.nama)}</td><td>${esc(u.role)}</td>
@@ -772,6 +772,8 @@ $('iTanggal').addEventListener('change', ()=>{ $('iTanggal').blur(); });
   if(!r || !r.user){ location.href='/login'; return; }
   S.user = r.user; S.settings = r.settings;
   $('chipUser').textContent = r.user.nama + ' (' + r.user.role + ')';
+  // tampilkan tab Admin hanya untuk admin/maker
+  if(S.user.role==='admin' || S.user.role==='maker') $('tabAdmin').style.display='';
   const bulan = new Date().toISOString().slice(0,7);
   $('fBulan').value = bulan; $('rBulan').value = ''; $('xBulan').value = bulan;
   $('iTanggal').value = new Date().toISOString().slice(0,10);

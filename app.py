@@ -64,9 +64,22 @@ def perlu_login(request: Request):
     return u
 
 
+ROLES = {
+    "maker": {"tulis": True, "hapus": True, "master": True, "admin": True, "export": True, "laporan": True},
+    "admin": {"tulis": True, "hapus": True, "master": True, "admin": True, "export": True, "laporan": True},
+    "fuelman": {"tulis": True, "hapus": False, "master": False, "admin": False, "export": True, "laporan": True},
+    "operator": {"tulis": True, "hapus": False, "master": False, "admin": False, "export": True, "laporan": True},
+    "watcher": {"tulis": False, "hapus": False, "master": False, "admin": False, "export": True, "laporan": True},
+}
+
+
+def boleh(u, aksi: str) -> bool:
+    return ROLES.get(u.get("role", "operator"), {}).get(aksi, False)
+
+
 def perlu_admin(request: Request):
     u = perlu_login(request)
-    if u["role"] != "admin":
+    if not boleh(u, "admin"):
         raise HTTPException(status_code=403, detail="Hanya admin")
     return u
 
@@ -159,6 +172,8 @@ def api_entries(request: Request, dari: str = "", sampai: str = "", bulan: str =
 @app.post("/api/entries")
 def api_entry_baru(request: Request, data: dict = Body(...)):
     u = perlu_login(request)
+    if not boleh(u, "tulis"):
+        raise HTTPException(403, "Tidak punya izin menambah data")
     if not (data.get("keluar") or data.get("masuk")):
         raise HTTPException(400, "Isi minimal salah satu: BBM keluar atau BBM masuk")
     rid = db.entry_simpan(data, user_id=u["id"])
@@ -170,6 +185,8 @@ def api_entry_baru(request: Request, data: dict = Body(...)):
 @app.put("/api/entries/{rid}")
 def api_entry_ubah(rid: int, request: Request, data: dict = Body(...)):
     u = perlu_login(request)
+    if not boleh(u, "tulis"):
+        raise HTTPException(403, "Tidak punya izin mengubah data")
     if not db.entry_ambil(rid):
         raise HTTPException(404, "Data tidak ditemukan")
     db.entry_simpan(data, user_id=u["id"], rec_id=rid)
@@ -180,8 +197,8 @@ def api_entry_ubah(rid: int, request: Request, data: dict = Body(...)):
 @app.delete("/api/entries/{rid}")
 def api_entry_hapus(rid: int, request: Request):
     u = perlu_login(request)
-    if u["role"] != "admin" and not os.environ.get("BBM_HAPUS_BEBAS") == "1":
-        raise HTTPException(403, "Hanya admin yang bisa menghapus")
+    if not boleh(u, "hapus") and not os.environ.get("BBM_HAPUS_BEBAS") == "1":
+        raise HTTPException(403, "Hanya admin/maker yang bisa menghapus")
     db.entry_hapus(rid)
     db.catat_log("hapus", f"#{rid}", u["username"])
     return {"ok": True}
@@ -208,6 +225,8 @@ def api_master(request: Request):
 @app.post("/api/master/{kind}")
 def api_master_simpan(kind: str, request: Request, data: dict = Body(...)):
     u = perlu_login(request)
+    if not boleh(u, "master"):
+        raise HTTPException(403, "Tidak punya izin mengubah master")
     if kind not in ("unit", "driver", "activity", "location"):
         raise HTTPException(400, "Jenis master tidak dikenal")
     rid = db.master_save(kind, data, rec_id=data.get("id"))
@@ -240,8 +259,10 @@ def api_user_baru(request: Request, data: dict = Body(...)):
         raise HTTPException(400, "Username dan password wajib")
     if db.find_user(username):
         raise HTTPException(400, "Username sudah dipakai")
-    uid = db.add_user(username, str(data["password"]), str(data.get("nama", "")),
-                      str(data.get("role", "operator")))
+    role = str(data.get("role", "operator"))
+    if role not in ROLES:
+        raise HTTPException(400, "Role tidak dikenal")
+    uid = db.add_user(username, str(data["password"]), str(data.get("nama", "")), role=role)
     db.catat_log("user-baru", username, u["username"])
     return {"ok": True, "id": uid}
 
@@ -251,7 +272,10 @@ def api_user_ubah(uid: int, request: Request, data: dict = Body(...)):
     u = perlu_admin(request)
     if data.get("password"):
         db.set_password(uid, str(data["password"]))
-    db.update_user(uid, nama=data.get("nama"), role=data.get("role"),
+    role = data.get("role")
+    if role and role not in ROLES:
+        raise HTTPException(400, "Role tidak dikenal")
+    db.update_user(uid, nama=data.get("nama"), role=role,
                    aktif=data.get("aktif"))
     db.catat_log("user-ubah", str(uid), u["username"])
     return {"ok": True}
@@ -293,7 +317,9 @@ async def api_import_excel(request: Request, file: UploadFile = File(...),
 def api_export_excel(request: Request, dari: str = "", sampai: str = "", bulan: str = "",
                      alat: str = "", lokasi: str = "", driver: str = "", q: str = "",
                      jenis: str = ""):
-    perlu_login(request)
+    u = perlu_login(request)
+    if not boleh(u, "export"):
+        raise HTTPException(403, "Tidak punya izin export")
     f = {"dari": dari, "sampai": sampai, "bulan": bulan, "alat": alat,
          "lokasi": lokasi, "driver": driver, "q": q, "jenis": jenis}
     data = db.semua_entries(f)
@@ -310,9 +336,8 @@ def api_export_excel(request: Request, dari: str = "", sampai: str = "", bulan: 
 @app.get("/api/template/excel")
 def api_template(request: Request):
     perlu_login(request)
-    bio = excel.template_kosong()
     return Response(
-        content=bio.getvalue(),
+        content=excel.template_kosong().getvalue(),
         media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
         headers={"Content-Disposition": 'attachment; filename="template_bbm.xlsx"'},
     )
@@ -356,7 +381,9 @@ def api_unduh_mandiri(request: Request):
 @app.get("/api/laporan/html", response_class=HTMLResponse)
 def api_laporan(request: Request, dari: str = "", sampai: str = "", bulan: str = "",
                 alat: str = "", lokasi: str = "", driver: str = ""):
-    perlu_login(request)
+    u = perlu_login(request)
+    if not boleh(u, "laporan"):
+        raise HTTPException(403, "Tidak punya izin laporan")
     f = {"dari": dari, "sampai": sampai, "bulan": bulan, "alat": alat,
          "lokasi": lokasi, "driver": driver}
     return HTMLResponse(report.laporan_html(db.rekap(f), db.semua_entries(f), db.get_settings(), f))
@@ -365,7 +392,9 @@ def api_laporan(request: Request, dari: str = "", sampai: str = "", bulan: str =
 @app.get("/api/laporan/wa")
 def api_laporan_wa(request: Request, dari: str = "", sampai: str = "", bulan: str = "",
                    alat: str = "", lokasi: str = "", driver: str = "", simpan: int = 0):
-    perlu_login(request)
+    u = perlu_login(request)
+    if not boleh(u, "laporan"):
+        raise HTTPException(403, "Tidak punya izin laporan")
     f = {"dari": dari, "sampai": sampai, "bulan": bulan, "alat": alat,
          "lokasi": lokasi, "driver": driver}
     teks = report.laporan_teks(db.rekap(f), db.get_settings(), f)

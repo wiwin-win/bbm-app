@@ -34,7 +34,7 @@ CREATE TABLE IF NOT EXISTS users (
   id          INTEGER PRIMARY KEY AUTOINCREMENT,
   username    TEXT NOT NULL UNIQUE,
   nama        TEXT NOT NULL DEFAULT '',
-  role        TEXT NOT NULL CHECK (role IN ('admin','operator')) DEFAULT 'operator',
+  role        TEXT NOT NULL CHECK (role IN ('admin','operator','maker','fuelman','watcher')) DEFAULT 'operator',
   pass_hash   TEXT NOT NULL,
   aktif       INTEGER NOT NULL DEFAULT 1,
   dibuat      TEXT NOT NULL
@@ -125,8 +125,21 @@ def init_db() -> None:
                     "ON entries(kunci) WHERE kunci IS NOT NULL")
         for k, v in DEFAULT_SETTINGS.items():
             con.execute("INSERT OR IGNORE INTO settings(key,value) VALUES(?,?)", (k, v))
-    if not any(u["role"] == "admin" for u in list_users()):
-        add_user("admin", "admin", "admin", role="admin")
+    # Seed user default hanya untuk mode lokal/dev. Di cloud (BBM_SEED=0) tidak dibuat.
+    seed_env = os.environ.get("BBM_SEED", "auto").strip().lower()
+    is_local = os.environ.get("BBM_HOST", "127.0.0.1") == "127.0.0.1" and seed_env != "0"
+    if seed_env == "1" or is_local:
+        if not any(u["role"] == "admin" for u in list_users()):
+            add_user("admin", "admin", "admin", role="admin")
+        # seed 4 user demo
+        seed = [
+            ("maker", "maker", "Maker", "maker"),
+            ("fuelman", "fuelman", "Fuelman", "fuelman"),
+            ("watcher", "watcher", "Watcher", "watcher"),
+        ]
+        for usr, pwd, nama, role in seed:
+            if not find_user(usr):
+                add_user(usr, pwd, nama, role=role)
 
 
 # ---------------------------------------------------------------- util

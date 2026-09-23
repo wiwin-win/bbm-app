@@ -33,6 +33,9 @@ header{
   box-shadow:var(--neu-light),var(--neu-dark);
   border-bottom:1px solid rgba(255,255,255,.35)
 }
+header, .merek, .merek .teks, header .chip{overflow:visible}
+header .chip{white-space:nowrap}
+.tema-toggle{flex-shrink:0}
 header::after{display:none}
 .merek .plat{
   background:var(--neu-bg);
@@ -45,6 +48,7 @@ header::after{display:none}
   color:var(--neu-txt);
   border:1px solid rgba(255,255,255,.25);
   box-shadow:var(--neu-light),var(--neu-dark);
+  padding:5px 10px;gap:6px
 }
 .chip .k{color:var(--neu-txt-3)}
 .chip b{color:var(--navy)}

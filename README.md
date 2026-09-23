@@ -22,13 +22,9 @@ Aplikasi monitoring BBM / Solar dengan antarmuka neumorphism (soft UI).
 
 ## Deploy ke Render
 
-1. Fork/clone repo ini ke GitHub
-2. Login ke [Render](https://dashboard.render.com)
-3. Klik **New +** → **Blueprint**
-4. Connect GitHub repo `wiwin-win/bbm-app`
-5. Render akan otomatis membaca `render.yaml` dan deploy
+[![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/wiwin-win/bbm-app)
 
-Atau deploy manual via **New +** → **Web Service**:
+Atau manual via **New +** → **Web Service**:
 - Runtime: Python 3
 - Build command: `pip install -r requirements.txt`
 - Start command: `uvicorn app:app --host 0.0.0.0 --port $PORT`

@@ -1,0 +1,768 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Monitoring BBM &amp; Alat</title>
+<link rel="manifest" href="/manifest.webmanifest">
+<link rel="icon" href="/static/favicon.ico" sizes="any">
+<link rel="icon" type="image/png" href="/static/icon-192.png">
+<link rel="apple-touch-icon" href="/static/icon-192.png">
+<meta name="theme-color" content="#1F3864">
+<link rel="stylesheet" href="/static/gaya.css">
+<link rel="stylesheet" href="/static/gaya-neu.css">
+</head>
+<body>
+<header>
+  <div class="merek">
+    <span class="plat"><img src="/static/logo.png" alt="Logo"></span>
+    <span class="teks">
+      <div class="instansi" id="instansi">PT GEMBIRA ANGGUN SETIA</div>
+      <h1>BBM &amp; ALAT</h1>
+      <div class="sub">Monitoring Pemakaian Solar</div>
+    </span>
+  </div>
+  <span class="sp"></span>
+  <span class="chip garis"><span class="k">Sisa stok</span><b id="chipStok">-</b></span>
+  <span class="chip"><span class="k">Bulan ini</span><b id="chipBulan">-</b> L</span>
+  <span class="chip" id="chipUser">-</span>
+</header>
+
+<nav>
+  <a class="aktif" data-tab="input">Input BBM</a>
+  <a data-tab="data">Data &amp; Riwayat</a>
+  <a data-tab="rekap">Rekap</a>
+  <a data-tab="master">Master</a>
+  <a data-tab="admin" id="tabAdmin">Admin</a>
+  <span class="kanan">
+    <button class="btn ghost sm" onclick="bukaLaporan()">Laporan / Cetak</button>
+    <button class="btn ghost sm" onclick="bukaPengaturan()">Pengaturan</button>
+    <button class="btn ghost sm" onclick="keluar()">Keluar</button>
+  </span>
+</nav>
+
+<main>
+  <!-- ================= INPUT BBM (halaman utama) ================= -->
+  <section id="tab-input">
+    <div class="kartu" style="margin-bottom:16px">
+      <div class="emas"><span>Stok Awal</span><b id="kAwal">0</b></div>
+      <div class="hijau"><span>BBM Masuk (periode)</span><b id="kMasuk">0</b></div>
+      <div class="oranye"><span>BBM Keluar (periode)</span><b id="kKeluar">0</b></div>
+      <div><span>Sisa Stok</span><b id="kSisa">0</b></div>
+      <div><span>Biaya BBM</span><b id="kBiaya">Rp 0</b></div>
+    </div>
+
+    <div class="dua-kolom">
+      <!-- ---------- KIRI: borang input ---------- -->
+      <div class="kiri-rekat">
+        <div class="panel kotak-input">
+          <h3><span class="langkah">1</span>Input BBM / Solar
+            <span class="hint" id="judulForm">data baru</span></h3>
+
+          <div class="seg">
+            <button id="segKeluar" class="on keluar" onclick="pilihJenis('keluar')">BBM KELUAR</button>
+            <button id="segMasuk" class="masuk" onclick="pilihJenis('masuk')">BBM MASUK</button>
+          </div>
+
+          <div class="grid2">
+            <div><label>Tanggal <span class="opsi-teks">(wajib)</span></label>
+              <input type="date" id="iTanggal"></div>
+            <div class="bidang"><label>Jumlah Liter <span class="opsi-teks">(wajib)</span></label>
+              <input type="number" step="0.01" min="0" inputmode="decimal" id="iLiter" class="besar" placeholder="0">
+              <span class="satuan">LITER</span></div>
+          </div>
+          <div class="liter-cepat" id="literCepat"></div>
+
+          <div class="grid2" style="margin-top:14px">
+            <div><label>Alat / No Lambung</label>
+              <input id="iAlat" list="dlAlat" autocomplete="off" placeholder="mis. LOADER (GAS 009)"></div>
+            <div><label>Nama OPT / Driver</label>
+              <input id="iDriver" list="dlDriver" autocomplete="off" placeholder="ketik nama"></div>
+            <div><label>Deskripsi Aktivitas</label>
+              <input id="iAktivitas" list="dlAkt" autocomplete="off" placeholder="mis. MAINTENANCE JALAN"></div>
+            <div><label>Lokasi Kegiatan</label>
+              <input id="iLokasi" list="dlLokasi" autocomplete="off" placeholder="mis. PT GAS"></div>
+            <div><label>Harga / Liter (Rp)</label>
+              <input type="number" step="1" min="0" id="iHarga" inputmode="numeric"></div>
+            <div><label>HM Awal / Akhir <span class="opsi-teks">(opsional)</span></label>
+              <input id="iHM" placeholder="17455 / 17460"></div>
+          </div>
+          <div style="margin-top:12px"><label>Keterangan <span class="opsi-teks">(opsional)</span></label>
+            <textarea id="iKet" rows="2" placeholder="catatan tambahan..."></textarea></div>
+
+          <div class="kilat">
+            <div class="kotak-kecil"><span>Input hari ini</span><b id="kHari">0 L</b></div>
+            <div class="kotak-kecil"><span>Nilai input ini</span><b id="kNilai">Rp 0</b></div>
+          </div>
+
+          <div class="gugus" style="margin-top:16px">
+            <button class="btn ok lg" id="bSimpan" onclick="simpanInput()">SIMPAN DATA</button>
+            <button class="btn ghost" onclick="bersihkan()">Bersihkan</button>
+            <span class="muted" id="statusSimpan"></span>
+          </div>
+          <div class="petunjuk">
+            Pintasan: <kbd>Ctrl</kbd>+<kbd>Enter</kbd> simpan &middot;
+            <kbd>Alt</kbd>+<kbd>1</kbd> keluar &middot; <kbd>Alt</kbd>+<kbd>2</kbd> masuk &middot;
+            <kbd>Esc</kbd> bersihkan
+          </div>
+        </div>
+      </div>
+
+      <!-- ---------- KANAN: unggah, unduh, riwayat ---------- -->
+      <div>
+        <div class="panel">
+          <h3><span class="langkah">2</span>Perbarui Data dari Excel
+            <span class="hint">unggah file .xlsx untuk menambah / mengganti data</span></h3>
+          <div class="jatuh" id="zona" onclick="document.getElementById('fileExcel').click()">
+            <div class="ikon">&#8682;</div>
+            <b>Lepas file Excel di sini</b>
+            <div class="ket">atau klik untuk memilih file (format .xlsx / .xlsm).<br>
+              Kolom dikenali otomatis: TANGGAL, NAMA OPT/DRIVER, ALAT NO LAMBUNG, DESKRIPSI AKTIVITAS,
+              LOKASI, BBM/LTR KELUAR, BBM MASUK, HARGA/LTR, KETERANGAN.</div>
+          </div>
+          <input type="file" id="fileExcel" accept=".xlsx,.xlsm" style="display:none" onchange="unggahExcel(this)">
+          <div class="gugus" style="margin-top:12px">
+            <button class="btn ghost" onclick="unduh('/api/template/excel','template-bbm')">Unduh Template Excel</button>
+            <button class="btn ghost" onclick="document.getElementById('fileExcel').click()">Pilih File Excel</button>
+            <label style="margin:0;display:flex;align-items:center;gap:7px;text-transform:none;letter-spacing:0;font-weight:500">
+              <input type="checkbox" id="uKosongkan" style="width:auto"> kosongkan data lama dulu
+            </label>
+          </div>
+          <div class="hasil-unggah" id="hasilUnggah"></div>
+        </div>
+
+        <div class="panel">
+          <h3><span class="langkah">3</span>Unduh Data ke Excel
+            <span class="hint">file .xlsx berisi sheet BBM (rincian) + REKAP</span></h3>
+          <div class="baris">
+            <div class="f mm"><label>Bulan</label><input type="month" id="xBulan"></div>
+            <div class="f" style="min-width:150px"><label>Dari</label><input type="date" id="xDari"></div>
+            <div class="f" style="min-width:150px"><label>Sampai</label><input type="date" id="xSampai"></div>
+            <div class="f"><label>Alat / No Lambung</label><input id="xAlat" list="dlAlat" placeholder="semua alat"></div>
+            <div class="f"><label>Lokasi</label><input id="xLokasi" list="dlLokasi" placeholder="semua lokasi"></div>
+          </div>
+          <div class="gugus" style="margin-top:12px">
+            <button class="btn" onclick="unduhExcel()">Unduh Sesuai Filter</button>
+            <button class="btn ghost" onclick="unduhExcel(true)">Unduh Semua Data (tanpa filter)</button>
+            <span class="muted" id="infoUnduh"></span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ---------- BAWAH: riwayat lebar penuh ---------- -->
+    <div class="panel">
+      <h3><span class="langkah">4</span>Input Terakhir
+        <span class="hint" id="hintTerakhir"></span></h3>
+      <div class="wrap" style="max-height:430px">
+        <table id="tblTerakhir">
+          <thead><tr>
+            <th>Tanggal</th><th>Alat / No Lambung</th><th>Driver</th>
+            <th>Deskripsi Aktivitas</th><th>Lokasi</th>
+            <th class="n">Keluar</th><th class="n">Masuk</th><th class="n">Sisa</th><th>Aksi</th>
+          </tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+      <div class="gugus" style="margin-top:12px">
+        <button class="btn ghost" onclick="pindah('data')">Lihat semua data &amp; filter &rarr;</button>
+        <span class="muted" id="infoTerakhir"></span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= DATA & RIWAYAT ================= -->
+  <section id="tab-data" style="display:none">
+    <div class="panel">
+      <div class="baris">
+        <div class="f" style="min-width:120px"><label>Dari tanggal</label><input type="date" id="fDari"></div>
+        <div class="f" style="min-width:120px"><label>Sampai</label><input type="date" id="fSampai"></div>
+        <div class="f mm"><label>Bulan</label><input type="month" id="fBulan"></div>
+        <div class="f"><label>Alat / No Lambung</label><input id="fAlat" placeholder="cari alat..." list="dlAlat"></div>
+        <div class="f"><label>Lokasi</label><input id="fLokasi" placeholder="cari lokasi..." list="dlLokasi"></div>
+        <div class="f"><label>Driver</label><input id="fDriver" placeholder="cari driver..." list="dlDriver"></div>
+        <div class="f"><label>Cari bebas</label><input id="fQ" placeholder="kata kunci..."></div>
+        <div class="f" style="min-width:130px;max-width:150px"><label>Jenis</label>
+          <select id="fJenis"><option value="">Semua</option><option value="keluar">Keluar</option><option value="masuk">Masuk</option></select></div>
+        <button class="btn" onclick="muat()">Terapkan</button>
+        <button class="btn ghost" onclick="resetFilter()">Reset</button>
+      </div>
+      <hr class="pisah">
+      <div class="gugus">
+        <button class="btn ok" onclick="formTambah()">+ Tambah Data</button>
+        <button class="btn ghost" onclick="unduhExcel()">Unduh Excel (filter ini)</button>
+        <button class="btn ghost" onclick="bukaLaporan()">Laporan / Cetak</button>
+        <button class="btn ghost" onclick="unduh('/api/template/excel','template-bbm')">Template Excel</button>
+        <button class="btn ghost" onclick="document.getElementById('fileExcel2').click()">Perbarui dari Excel</button>
+        <input type="file" id="fileExcel2" accept=".xlsx,.xlsm" style="display:none" onchange="unggahExcel(this)">
+        <span class="muted" id="infoBaris"></span>
+      </div>
+    </div>
+    <div class="wrap">
+      <table id="tblData">
+        <thead><tr>
+          <th>No</th><th>Tanggal</th><th>Nama OPT / Driver</th><th>Alat / No Lambung</th>
+          <th>Deskripsi Aktivitas</th><th>Lokasi Kegiatan</th>
+          <th class="n">BBM Keluar (L)</th><th class="n">BBM Masuk (L)</th><th class="n">Harga/L</th>
+          <th class="n">Sisa Stok (L)</th><th class="n">Nilai Keluar</th><th>Aksi</th>
+        </tr></thead>
+        <tbody></tbody>
+        <tfoot></tfoot>
+      </table>
+    </div>
+  </section>
+
+  <!-- ================= REKAP ================= -->
+  <section id="tab-rekap" style="display:none">
+    <div class="panel">
+      <div class="baris">
+        <div class="f mm"><label>Bulan</label><input type="month" id="rBulan"></div>
+        <div class="f" style="min-width:140px"><label>Lokasi</label><input id="rLokasi" list="dlLokasi"></div>
+        <button class="btn" onclick="muatRekap()">Tampilkan</button>
+        <button class="btn ghost" onclick="document.getElementById('rBulan').value='';document.getElementById('rLokasi').value='';muatRekap()">Semua</button>
+        <button class="btn ghost" onclick="unduhExcel()">Unduh Excel</button>
+      </div>
+    </div>
+    <div class="kartu padat">
+      <div><span>Pemakaian Alat</span><b id="rkPakai">-</b>
+        <div class="kecil" id="rkPeriode">-</div></div>
+      <div><span>Biaya Pemakaian</span><b id="rkBiaya">-</b>
+        <div class="kecil" id="rkBaris">-</div></div>
+      <div><span>Catatan Khusus</span><b id="rkCatatan">-</b>
+        <div class="kecil" id="rkCatatanBaris">-</div></div>
+      <div><span>Sisa Stok</span><b id="rkStok">-</b>
+        <div class="kecil" id="rkStokKecil">-</div></div>
+    </div>
+    <div id="rkCatatanKotak"></div>
+    <div class="panel"><h3>Pemakaian Harian (Liter)</h3>
+      <div class="graf-kosong" id="grafikInfo">Pilih bulan atau lokasi lalu klik Tampilkan untuk melihat grafik.</div>
+      <canvas id="grafik" height="230"></canvas>
+      <div class="graf-kaki"><span id="grafKaki">Menampilkan pemakaian harian (BBM keluar) pada periode terpilih.</span>
+      <span>Klik <b>Semua</b> untuk seluruh periode</span></div></div>
+    <div class="grid3" id="kotakRekap"></div>
+  </section>
+
+  <!-- ================= MASTER ================= -->
+  <section id="tab-master" style="display:none">
+    <div class="panel">
+      <div class="baris">
+        <button class="btn" onclick="formMaster('unit')">+ Alat / Unit</button>
+        <button class="btn" onclick="formMaster('driver')">+ Driver / OPT</button>
+        <button class="btn" onclick="formMaster('activity')">+ Aktivitas</button>
+        <button class="btn" onclick="formMaster('location')">+ Lokasi</button>
+        <span class="muted">Master ini mengisi daftar pilihan saat input, agar penulisan data konsisten.</span>
+      </div>
+    </div>
+    <div class="grid2">
+      <div class="panel"><h3>Alat / Unit <span class="badge" id="nUnit">0</span></h3>
+        <div class="wrap" style="max-height:340px"><table id="tblUnit"></table></div></div>
+      <div class="panel"><h3>Driver / OPT <span class="badge" id="nDriver">0</span></h3>
+        <div class="wrap" style="max-height:340px"><table id="tblDriver"></table></div></div>
+      <div class="panel"><h3>Deskripsi Aktivitas <span class="badge" id="nAkt">0</span></h3>
+        <div class="wrap" style="max-height:340px"><table id="tblActivity"></table></div></div>
+      <div class="panel"><h3>Lokasi Kegiatan <span class="badge" id="nLok">0</span></h3>
+        <div class="wrap" style="max-height:340px"><table id="tblLocation"></table></div></div>
+    </div>
+  </section>
+
+  <!-- ================= ADMIN ================= -->
+  <section id="tab-admin" style="display:none">
+    <div class="panel"><h3>Pengaturan Aplikasi</h3>
+      <div class="grid3">
+        <div><label>Nama Instansi / Perusahaan</label><input id="sInstansi"></div>
+        <div><label>Harga BBM default (Rp/Liter)</label><input id="sHarga" type="number"></div>
+        <div><label>Stok awal (Liter)</label><input id="sStok" type="number" step="0.1"></div>
+      </div>
+      <br><button class="btn" onclick="simpanSetting()">Simpan Pengaturan</button>
+    </div>
+    <div class="panel"><h3>Pengguna Aplikasi</h3>
+      <div class="baris" style="margin-bottom:10px">
+        <div class="f"><label>Username</label><input id="uNama"></div>
+        <div class="f"><label>Nama tampilan</label><input id="uTampil"></div>
+        <div class="f"><label>Password</label><input id="uPass" type="password"></div>
+        <div class="f" style="max-width:140px"><label>Peran</label><select id="uRole"><option value="operator">Operator</option><option value="admin">Admin</option></select></div>
+        <button class="btn" onclick="tambahUser()">Tambah</button>
+      </div>
+      <table id="tblUser"></table>
+    </div>
+    <div class="panel"><h3>Pemeliharaan</h3>
+      <div class="baris">
+        <button class="btn ghost" onclick="backup()">Backup Database</button>
+        <button class="btn ghost" onclick="muatLog()">Lihat Log Aktivitas</button>
+        <button class="btn ghost" onclick="unduhExcel(true)">Unduh Semua Data (Excel)</button>
+        <button class="btn ghost" onclick="unduhAplikasiHP()">Aplikasi HP (offline)</button>
+      </div>
+      <div class="wrap" style="max-height:300px;margin-top:10px"><table id="tblLog"></table></div>
+    </div>
+  </section>
+</main>
+
+<datalist id="dlAlat"></datalist>
+<datalist id="dlDriver"></datalist>
+<datalist id="dlLokasi"></datalist>
+<datalist id="dlAkt"></datalist>
+
+<div class="modal" id="modal"><div class="box" id="modalBox"></div></div>
+<div class="pesan" id="pesan"></div>
+
+<script>
+const S = {master:{unit:[],driver:[],activity:[],location:[]}, user:null, settings:null, data:null};
+const $ = id => document.getElementById(id);
+const esc = s => String(s==null?'':s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const ltr = v => (Number(v)||0).toLocaleString('id-ID',{maximumFractionDigits:2});
+const rp  = v => 'Rp ' + (Number(v)||0).toLocaleString('id-ID',{maximumFractionDigits:0});
+const tglID = s => { if(!s) return '-'; const b=['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
+  const d=new Date(s+'T00:00:00'); return isNaN(d)?s:`${d.getDate()} ${b[d.getMonth()]} ${d.getFullYear()}`; };
+let JENIS = 'keluar';
+
+function toast(msg, err){ const p=$('pesan'); p.textContent=msg; p.className='pesan tampil'+(err?' err':''); setTimeout(()=>p.className='pesan',3800); }
+function api(url, opt){ return fetch(url, opt).then(async r => { const t=await r.text(); let j; try{j=JSON.parse(t)}catch(e){j={detail:t}} if(!r.ok) throw new Error(j.detail||('HTTP '+r.status)); return j; }); }
+function unduh(url, nama, ekstensi){ const p=new URLSearchParams(filterUnduh()).toString(); fetch(url+(p?'?'+p:'')).then(r=>{ if(!r.ok) throw new Error('gagal'); return r.blob(); }).then(b=>{
+  const a=document.createElement('a'); a.href=URL.createObjectURL(b);
+  a.download = (nama||'BBM')+'_'+new Date().toISOString().slice(0,16).replace(/[:T-]/g,'')+'.'+(ekstensi||'xlsx'); a.click(); toast('File Excel dibuat'); }).catch(e=>toast('Gagal: '+e.message,true)); }
+function unduhAplikasiHP(){
+  fetch('/unduh/bbm-hp.html').then(r=>{ if(!r.ok) throw new Error('gagal'); return r.blob(); }).then(b=>{
+    const a=document.createElement('a'); a.href=URL.createObjectURL(b); a.download='BBM-HP-Input.html'; a.click();
+    toast('File aplikasi HP dibuat — kirim ke HP lalu buka'); }).catch(e=>toast('Gagal: '+e.message,true)); }
+
+/* ---------- navigasi ---------- */
+const TAB = ['input','data','rekap','master','admin'];
+function pindah(nama){ pindahTab(nama); window.scrollTo({top:0,behavior:'smooth'}); }
+function pindahTab(nama){
+  document.querySelectorAll('nav a[data-tab]').forEach(x=>x.classList.toggle('aktif', x.dataset.tab===nama));
+  TAB.forEach(t => $('tab-'+t).style.display = (t===nama?'':'none'));
+  if(nama==='data') muat();
+  if(nama==='rekap') muatRekap();
+  if(nama==='master') muatMaster();
+  if(nama==='admin') muatAdmin();
+}
+document.querySelectorAll('nav a[data-tab]').forEach(a => a.onclick = () => pindahTab(a.dataset.tab));
+
+/* ---------- filter ---------- */
+function filterAktif(){ const o={}; const m={fDari:'dari',fSampai:'sampai',fBulan:'bulan',fAlat:'alat',fLokasi:'lokasi',fDriver:'driver',fQ:'q',fJenis:'jenis'};
+  for(const k in m){ const el=$(k); const v=(el.value||'').trim(); if(v) o[m[k]]=v; } return o; }
+function filterUnduh(){
+  if($('tab-data').style.display==='') return filterAktif();
+  const o={}; const m={xBulan:'bulan',xDari:'dari',xSampai:'sampai',xAlat:'alat',xLokasi:'lokasi'};
+  for(const k in m){ const el=$(k); if(!el) continue; const v=(el.value||'').trim(); if(v) o[m[k]]=v; }
+  return o;
+}
+function resetFilter(){ ['fDari','fSampai','fBulan','fAlat','fLokasi','fDriver','fQ','fJenis'].forEach(i=>$(i).value=''); muat(); }
+function unduhExcel(semua){
+  const q = semua ? '' : new URLSearchParams(filterUnduh()).toString();
+  fetch('/api/export/excel'+(q?'?'+q:'')).then(r=>{ if(!r.ok) throw new Error('gagal'); return r.blob(); }).then(b=>{
+    const a=document.createElement('a'); a.href=URL.createObjectURL(b);
+    a.download='BBM_'+new Date().toISOString().slice(0,16).replace(/[:T-]/g,'')+'.xlsx'; a.click();
+    toast('Excel terunduh ('+(semua?'semua data':'sesuai filter')+')');
+  }).catch(e=>toast('Gagal mengunduh: '+e.message, true));
+}
+
+/* ---------- data utama ---------- */
+async function muat(){
+  const qs = new URLSearchParams(filterAktif()); qs.set('limit','500');
+  const r = await api('/api/entries?'+qs);
+  S.data = r;
+  const tb = $('tblData').querySelector('tbody');
+  tb.innerHTML = r.rows.map((x,i) => `<tr>
+    <td>${i+1}</td><td class="kini">${esc(x.tanggal)}</td><td>${esc(x.driver)}</td><td>${esc(x.no_lambung)}</td>
+    <td>${esc(x.aktivitas)}</td><td>${esc(x.lokasi)}</td>
+    <td class="n">${ltr(x.keluar)}</td><td class="n">${ltr(x.masuk)}</td><td class="n">${ltr(x.harga)}</td>
+    <td class="n">${ltr(x.sisa_stok)}</td><td class="n">${rp(x.keluar*x.harga)}</td>
+    <td><div class="aksi"><button class="btn sm ghost" onclick="formEdit(${x.id})">Edit</button>
+        ${S.user.role==='admin'?`<button class="btn sm merah" onclick="hapusData(${x.id})">Hapus</button>`:''}</div></td></tr>`).join('')
+    || '<tr><td colspan="12" class="muted" style="text-align:center;padding:22px">Belum ada data. Isi di menu Input BBM.</td></tr>';
+  $('tblData').querySelector('tfoot').innerHTML = `<tr><td colspan="6">TOTAL (${r.total} baris)</td>
+    <td class="n">${ltr(r.total_keluar)}</td><td class="n">${ltr(r.total_masuk)}</td><td></td><td></td>
+    <td class="n">${rp(r.total_biaya)}</td><td></td></tr>`;
+  $('infoBaris').textContent = r.total + ' baris ditampilkan';
+  const sisa = r.rows.length ? r.rows[0].sisa_stok : 0;
+  $('kKeluar').textContent = ltr(r.total_keluar)+' L'; $('kMasuk').textContent = ltr(r.total_masuk)+' L';
+  $('kBiaya').textContent = rp(r.total_biaya); $('kSisa').textContent = ltr(sisa)+' L';
+  $('chipStok').textContent = ltr(sisa)+' L';
+  const rk = await api('/api/ringkasan'); $('kAwal').textContent = ltr(rk.data.stok_awal)+' L';
+  $('chipBulan').textContent = ltr(rk.data.keluar);
+  $('instansi').textContent = S.settings.nama_instansi || 'PT GEMBIRA ANGGUN SETIA';
+  $('infoUnduh').textContent = r.total + ' baris siap diunduh';
+  muatTerakhir();
+}
+
+async function muatTerakhir(){
+  const r = await api('/api/entries?limit=12');
+  const hariIni = new Date().toISOString().slice(0,10);
+  const hari = r.rows.filter(x=>x.tanggal===hariIni);
+  $('hintTerakhir').textContent = r.total + ' baris total di database';
+  $('infoTerakhir').textContent = 'Menampilkan ' + r.rows.length + ' baris terbaru dari ' + r.total + '.';
+  $('kHari').textContent = ltr(hari.reduce((a,x)=>a+(Number(x.keluar)||0),0))+' L';
+  $('tblTerakhir').querySelector('tbody').innerHTML = r.rows.map(x=>`<tr>
+    <td>${esc(x.tanggal)}</td><td><b>${esc(x.no_lambung||'-')}</b></td><td>${esc(x.driver||'-')}</td>
+    <td>${esc(x.aktivitas||'-')}</td><td>${esc(x.lokasi||'-')}</td>
+    <td class="n">${x.keluar?ltr(x.keluar):'-'}</td><td class="n">${x.masuk?ltr(x.masuk):'-'}</td>
+    <td class="n">${ltr(x.sisa_stok)}</td>
+    <td><button class="btn sm ghost" onclick="formEdit(${x.id})">Edit</button></td></tr>`).join('')
+    || '<tr><td colspan="9" class="muted" style="text-align:center;padding:20px">Belum ada data.</td></tr>';
+}
+
+/* ---------- input ---------- */
+function pilihJenis(j){
+  JENIS = j;
+  $('segKeluar').className = j==='keluar' ? 'on keluar' : '';
+  $('segMasuk').className  = j==='masuk'  ? 'on masuk'  : 'masuk';
+  $('literCepat').innerHTML = (j==='keluar' ? [20,50,100,200] : [1000,2000,4900]).map(v=>
+    `<button class="pil-angka" onclick="isiLiter(${v})">${ltr(v)} L</button>`).join('');
+  hitungNilai();
+}
+function isiLiter(v){ $('iLiter').value = v; hitungNilai(); }
+function hitungNilai(){
+  const l = parseFloat($('iLiter').value||0), h = parseFloat($('iHarga').value||0) || (S.settings? S.settings.harga_default:0) || 0;
+  $('kNilai').textContent = rp(l*h);
+}
+async function simpanInput(){
+  const l = parseFloat($('iLiter').value||0);
+  const tgl = $('iTanggal').value;
+  const o = {tanggal:tgl, driver:$('iDriver').value.trim(), no_lambung:$('iAlat').value.trim(),
+             aktivitas:$('iAktivitas').value.trim(), lokasi:$('iLokasi').value.trim(),
+             keluar: JENIS==='keluar'? l : 0, masuk: JENIS==='masuk'? l : 0,
+             harga: parseFloat($('iHarga').value||0) || (S.settings? S.settings.harga_default:0) || 0,
+             keterangan:$('iKet').value.trim()};
+  if(!tgl) return toast('Tanggal belum diisi', true);
+  if(!l || l<=0) return toast('Jumlah liter belum diisi', true);
+  if(JENIS==='keluar' && !o.no_lambung) return toast('Alat / No Lambung wajib untuk BBM keluar', true);
+  const hm = ($('iHM').value||'').split('/');
+  if(hm[0] && !isNaN(parseFloat(hm[0]))) o.hm_awal = parseFloat(hm[0]);
+  if(hm[1] && !isNaN(parseFloat(hm[1]))) o.hm_akhir = parseFloat(hm[1]);
+  const tombol = $('bSimpan'); tombol.disabled = true; tombol.textContent = 'Menyimpan...';
+  try{
+    await api('/api/entries', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(o)});
+    $('statusSimpan').textContent = 'Tersimpan: '+ltr(l)+' L '+tglID(tgl);
+    toast('Data tersimpan: '+ltr(l)+' L');
+    if(navigator.vibrate) navigator.vibrate(35);
+    bersihkan(true);
+    await muatMaster(); await muat();
+  }catch(e){ toast('Gagal menyimpan: '+e.message, true); }
+  finally{ tombol.disabled = false; tombol.textContent = 'SIMPAN DATA'; }
+}
+function bersihkan(pertahankan){
+  $('iLiter').value=''; $('iKet').value=''; $('iHM').value='';
+  $('iDriver').value=''; $('iAlat').value=''; $('iAktivitas').value=''; $('iLokasi').value='';
+  $('iTanggal').value = new Date().toISOString().slice(0,10);
+  hitungNilai();
+  if(!pertahankan) toast('Borang dibersihkan');
+  $('iLiter').focus();
+}
+function isiHargaDefault(){ $('iHarga').value = (S.settings && S.settings.harga_default) || 0; }
+
+/* ---------- form modal ---------- */
+function opsi(list, kunci){ return list.map(o=>`<option value="${esc(o[kunci])}">`).join(''); }
+function formTambah(){ formData({tanggal:new Date().toISOString().slice(0,10), harga:S.settings.harga_default}, 'Tambah Data BBM'); }
+function formEdit(id){
+  const d = (S.data && S.data.rows.find(x=>x.id===id)) || null;
+  if(d) return formData(d,'Ubah Data BBM');
+  api('/api/entries?limit=500').then(r=>{ const x=r.rows.find(y=>y.id===id); if(x) formData(x,'Ubah Data BBM'); });
+}
+function formData(d, judul){
+  $('modalBox').innerHTML = `<h3>${judul}</h3><form onsubmit="simpanData(event, ${d.id||0})">
+   <div class="grid3">
+    <div><label>Tanggal *</label><input type="date" name="tanggal" value="${d.tanggal||''}" required></div>
+    <div><label>Nama OPT / Driver</label><input name="driver" list="dlDriver" value="${esc(d.driver||'')}" autocomplete="off"></div>
+    <div><label>Alat / No Lambung</label><input name="no_lambung" list="dlAlat" value="${esc(d.no_lambung||'')}" autocomplete="off"></div>
+    <div><label>Deskripsi Aktivitas</label><input name="aktivitas" list="dlAkt" value="${esc(d.aktivitas||'')}" autocomplete="off"></div>
+    <div><label>Lokasi Kegiatan</label><input name="lokasi" list="dlLokasi" value="${esc(d.lokasi||'')}" autocomplete="off"></div>
+    <div><label>BBM / Ltr (Keluar)</label><input type="number" step="0.01" min="0" name="keluar" value="${d.keluar||''}"></div>
+    <div><label>BBM Masuk (Ltr)</label><input type="number" step="0.01" min="0" name="masuk" value="${d.masuk||''}"></div>
+    <div><label>Harga / Liter (Rp)</label><input type="number" step="1" min="0" name="harga" value="${d.harga||S.settings.harga_default||0}"></div>
+    <div><label>HM Awal (opsional)</label><input type="number" step="0.1" name="hm_awal" value="${d.hm_awal??''}"></div>
+    <div><label>HM Akhir (opsional)</label><input type="number" step="0.1" name="hm_akhir" value="${d.hm_akhir??''}"></div>
+   </div>
+   <br><div><label>Keterangan</label><textarea name="keterangan">${esc(d.keterangan||'')}</textarea></div>
+   <div class="baris" style="margin-top:12px">
+     <button class="btn ok" type="submit">Simpan</button>
+     <button class="btn ghost" type="button" onclick="tutup()">Batal</button>
+     <span class="muted">Isi salah satu: BBM Keluar atau BBM Masuk.</span>
+   </div></form>`;
+  buka();
+}
+async function simpanData(ev, id){
+  ev.preventDefault(); const f = new FormData(ev.target), o = {};
+  f.forEach((v,k)=>o[k]=v);
+  try{ await api(id? '/api/entries/'+id : '/api/entries', {method:id?'PUT':'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(o)});
+    tutup(); toast(id?'Perubahan disimpan':'Data tersimpan'); muatMaster(); muat(); }
+  catch(e){ toast('Gagal: '+e.message, true); }
+}
+async function hapusData(id){ if(!confirm('Hapus data ini?')) return;
+  try{ await api('/api/entries/'+id, {method:'DELETE'}); toast('Data dihapus'); muat(); }catch(e){ toast(e.message,true); } }
+
+/* ---------- unggah Excel (perbarui data) ---------- */
+(function siapkanZona(){
+  const z = $('zona');
+  ['dragenter','dragover'].forEach(ev => z.addEventListener(ev, e => { e.preventDefault(); z.classList.add('siap'); }));
+  ['dragleave','drop'].forEach(ev => z.addEventListener(ev, e => { e.preventDefault(); z.classList.remove('siap'); }));
+  z.addEventListener('drop', e => {
+    const f = e.dataTransfer && e.dataTransfer.files[0];
+    if(f) unggahBerkas(f);
+  });
+})();
+function unggahExcel(inp){ if(inp.files.length) unggahBerkas(inp.files[0]); inp.value=''; }
+async function unggahBerkas(file){
+  const nama = (file.name||'').toLowerCase();
+  if(!/\.(xlsx|xlsm)$/.test(nama)) return toast('Pilih file .xlsx / .xlsm', true);
+  const kotak = $('hasilUnggah');
+  kotak.style.display='block'; kotak.className='hasil-unggah';
+  kotak.innerHTML = 'Membaca <b>'+esc(file.name)+'</b> ('+Math.round(file.size/1024)+' KB) ...';
+  const fd = new FormData(); fd.append('file', file);
+  fd.append('kosongkan', ($('uKosongkan') && $('uKosongkan').checked) ? '1' : '0');
+  try{
+    const r = await api('/api/import/excel', {method:'POST', body:fd});
+    kotak.className = 'hasil-unggah';
+    kotak.innerHTML = `<b>Berhasil diperbarui dari ${esc(r.sheet)}</b><br>
+      ${r.baris} baris terbaca (${esc(r.dari)} s/d ${esc(r.sampai)})${r.kosongkan? ' &middot; data lama dikosongkan':''}<br>
+      Master baru: ${r.alat_baru} alat, ${r.driver_baru} driver, ${r.lokasi_baru||0} lokasi, ${r.aktivitas_baru||0} aktivitas.`;
+    toast('Data diperbarui: '+r.baris+' baris');
+    await muatMaster(); await muat(); muatRekap();
+  }catch(e){
+    kotak.className = 'hasil-unggah galat';
+    kotak.innerHTML = '<b>Gagal membaca file</b><br>'+esc(e.message);
+    toast('Unggah gagal: '+e.message, true);
+  }
+  if($('uKosongkan')) $('uKosongkan').checked = false;
+}
+
+/* ---------- laporan ---------- */
+function bukaLaporan(){
+  const qs = new URLSearchParams(filterUnduh()).toString();
+  window.open('/api/laporan/html'+(qs?'?'+qs:''), '_blank');
+  api('/api/laporan/wa'+(qs?'?'+qs:'')).then(r=>{ $('modalBox').className='box';
+    $('modalBox').innerHTML = `<h3>Format Laporan WhatsApp</h3>
+     <textarea style="min-height:340px;font-family:var(--mono)">${esc(r.teks)}</textarea>
+     <div class="baris" style="margin-top:10px"><button class="btn" onclick="salin()">Salin</button>
+     <button class="btn ghost" onclick="tutup()">Tutup</button></div>`; buka(); });
+}
+function salin(){ const t=$('modalBox').querySelector('textarea'); t.select(); document.execCommand('copy'); toast('Teks disalin'); }
+
+/* ---------- rekap ---------- */
+// Tabel rekap: baris teratas saja, TAPI baris TOTAL memakai total sebenarnya
+// (termasuk yang tidak ditampilkan) supaya tidak salah baca.
+function kartuRekap(judul, data, kunci, label, sisa){
+  if(!data.length) return '';
+  const dalam = data.reduce((a,x)=>a+(x.keluar||0),0);
+  const biaya = data.reduce((a,x)=>a+(x.biaya||0),0);
+  const luar = sisa && sisa.n ? sisa : null;
+  const catatan = luar
+    ? `+ ${luar.n} entri lain (${ltr(luar.keluar)} L) tidak ditampilkan — ini hanya ${data.length} pemakai teratas`
+    : `${data.length} entri`;
+  return `<div class="panel"><h3>${judul}<span class="hint">${catatan}</span></h3>
+    <table><thead><tr><th>${label}</th><th class="n">Liter</th><th class="n">Biaya</th></tr></thead><tbody>` +
+    data.map(x=>`<tr><td>${esc(x[kunci]||'(kosong)')}</td><td class="n">${ltr(x.keluar)}</td>
+      <td class="n">${rp(x.biaya||0)}</td></tr>`).join('') +
+    `</tbody><tfoot><tr><td>TOTAL ${data.length} teratas${luar?` + ${luar.n} lainnya`:''} = ${sisa&&sisa.total_grup?sisa.total_grup:data.length} entri</td>
+       <td class="n">${ltr(dalam + (luar?luar.keluar:0))}</td>
+       <td class="n">${rp(biaya + (luar?luar.biaya:0))}</td></tr></tfoot></table></div>`;
+}
+async function muatRekap(){
+  const q = {}; if($('rBulan').value) q.bulan=$('rBulan').value; if($('rLokasi').value) q.lokasi=$('rLokasi').value;
+  const r = await api('/api/rekap?'+new URLSearchParams(q)); const d = r.data;
+  // --- kartu angka ---
+  $('rkPakai').textContent = ltr(d.pemakaian_keluar)+' L';
+  $('rkBiaya').textContent = rp(d.pemakaian_biaya);
+  $('rkCatatan').textContent = d.catatan.length ? ltr(d.catatan_keluar)+' L' : 'Tidak ada';
+  $('rkCatatanBaris').textContent = d.catatan.length ? d.catatan.length+' baris tidak dihitung sebagai pemakaian alat' : 'semua baris sah';
+  $('rkStok').textContent = ltr(d.sisa_stok)+' L';
+  // Kartu sisa stok = saldo berjalan s/d akhir periode; jelaskan basisnya supaya
+  // tidak dibandingkan dengan mutasi periode ini saja.
+  $('rkStokKecil').textContent = 'saldo s/d '+ (d.sisa_basis || d.periode_akhir || '-')
+    + ' · periode ini masuk ' + ltr(d.total_masuk) + ' − keluar ' + ltr(d.total_keluar);
+  $('rkPeriode').textContent = (d.periode_awal||'-') + '  s/d  ' + (d.periode_akhir||'-');
+  $('rkBaris').textContent = d.baris + ' baris';
+  // --- peringatan baris catatan ---
+  $('rkCatatanKotak').innerHTML = d.catatan.length ? `
+    <div class="panel panel-catatan"><h3>Catatan Khusus dari Excel
+      <span class="hint">tidak dihitung sebagai pemakaian alat</span></h3>
+      <table><thead><tr><th>Keterangan Asli</th><th>Tanggal Data</th><th>Lokasi</th>
+        <th class="n">Liter</th><th class="n">Nilai</th></tr></thead><tbody>` +
+      d.catatan.map(c=>`<tr><td><b>${esc(c.no_lambung||'-')}</b></td><td class="kini">${esc(c.tanggal)}</td>
+        <td>${esc(c.lokasi||'-')}</td><td class="n">${ltr(c.keluar)}</td>
+        <td class="n">${rp(c.biaya||0)}</td></tr>`).join('') +
+      `</tbody><tfoot><tr><td colspan="3">TOTAL ${d.catatan.length} baris catatan</td>
+       <td class="n">${ltr(d.catatan_keluar)}</td><td class="n">${rp(d.catatan_biaya)}</td></tr></tfoot>
+      </table><div class="catatan">Baris ini ikut masuk sisa stok (karena memang BBM yang keluar dari
+      tangki), tapi dipisahkan dari rekap pemakaian alat supaya angka per alat/driver tidak menyesatkan.</div></div>` : '';
+  // --- tabel per kelompok ---
+  $('kotakRekap').innerHTML =
+    kartuRekap('Per Alat / No Lambung', d.per_alat, 'no_lambung', 'ALAT / NO LAMBUNG', d.sisa_alat) +
+    kartuRekap('Per Lokasi Kegiatan', d.per_lokasi, 'lokasi', 'LOKASI', d.sisa_lokasi) +
+    kartuRekap('Per Driver / OPT', d.per_driver, 'driver', 'NAMA OPT / DRIVER', d.sisa_driver) +
+    kartuRekap('Per Aktivitas', d.per_aktivitas, 'aktivitas', 'DESKRIPSI AKTIVITAS', d.sisa_aktivitas);
+  if(!$('kotakRekap').innerHTML) $('kotakRekap').innerHTML =
+    '<div class="panel"><div class="kosong">Belum ada data pada periode ini.</div></div>';
+  grafik(d.harian);
+}
+function grafik(harian){
+  const cv = $('grafik'), ctx = cv.getContext('2d');
+  const petunjuk = $('grafikInfo'), kaki = $('grafKaki');
+  // Canvas tidak bisa digambar saat tabnya tersembunyi: lebar elemen 0 diukur
+  // waktu display:none, dan nilai 0 itu "menempel" sampai digambar ulang.
+  if(!cv.clientWidth){ requestAnimationFrame(()=>grafik(harian)); return; }
+  const DPR = devicePixelRatio||1;
+  const W = cv.width = Math.round(cv.clientWidth * DPR), H = cv.height = 230 * DPR;
+  ctx.setTransform(1,0,0,1,0,0); ctx.clearRect(0,0,W,H);
+  cv.style.display = 'block'; if(petunjuk) petunjuk.style.display = 'none';
+  if(!harian.length){
+    ctx.fillStyle='#8A94A6'; ctx.font=(13*DPR)+'px Segoe UI';
+    ctx.fillText('Belum ada data pada periode ini', 14*DPR, 30*DPR);
+    if(kaki) kaki.textContent = '';
+    return;
+  }
+  const kiri = 62*DPR, kanan = 10*DPR, atas = 26*DPR, bawah = 30*DPR;
+  const lebar = W - kiri - kanan, tinggi = H - atas - bawah;
+  // Skala hanya dari BBM KELUAR. Kalau BBM masuk ikut menentukan skala, satu
+  // pengisian tangki 10.000 L membuat semua batang pemakaian jadi tak terlihat.
+  const maxK = Math.max.apply(null, harian.map(x=>x.keluar||0)) || 1;
+  const skala = Math.pow(10, Math.floor(Math.log10(maxK)));
+  const atasSkala = Math.ceil(maxK / (skala/2)) * (skala/2);
+  const y = v => atas + tinggi - (v/atasSkala)*tinggi;
+  // garis skala + label sumbu Y (liter)
+  ctx.font = (10*DPR)+'px Segoe UI'; ctx.textAlign='right'; ctx.textBaseline='middle';
+  for(let i=0;i<=4;i++){
+    const v = atasSkala*i/4, yy = y(v);
+    ctx.strokeStyle = i? '#eef2f8' : '#CBD5E1';
+    ctx.beginPath(); ctx.moveTo(kiri, yy); ctx.lineTo(kiri+lebar, yy); ctx.stroke();
+    ctx.fillStyle='#7A8699'; ctx.fillText(ltr(Math.round(v)), kiri-8*DPR, yy);
+  }
+  ctx.textAlign='center'; ctx.textBaseline='top';
+  const bw = lebar / harian.length;
+  const tampilLabel = harian.length <= 32;
+  harian.forEach((x,i)=>{
+    const hk = (x.keluar||0)/atasSkala*tinggi;
+    if(hk>0){ ctx.fillStyle='#1F3864';
+      ctx.fillRect(kiri+i*bw+bw*0.16, y(x.keluar), Math.max(bw*0.68,1), hk); }
+    // BBM masuk digambar tipis di atas garis dasar supaya tetap terlihat
+    // meski skalanya jauh lebih kecil dari pengisian tangki.
+    const hm = Math.max((x.masuk||0)/atasSkala*tinggi, x.masuk? 2*DPR : 0);
+    if(hm>0.5){ ctx.fillStyle='#E24A1A';
+      ctx.fillRect(kiri+i*bw+bw*0.16, y(0)-hm, Math.max(bw*0.68,1), hm); }
+    if(tampilLabel){ ctx.fillStyle='#7A8699'; ctx.font=(9.5*DPR)+'px Segoe UI';
+      ctx.fillText(x.tanggal.slice(8)+'/'+x.tanggal.slice(5,7), kiri+i*bw+bw/2, atas+tinggi+7*DPR); }
+  });
+  ctx.strokeStyle='#CBD5E1'; ctx.beginPath(); ctx.moveTo(kiri, y(0)); ctx.lineTo(kiri+lebar, y(0)); ctx.stroke();
+  // legenda
+  ctx.textAlign='left'; ctx.textBaseline='middle'; ctx.font=(11*DPR)+'px Segoe UI';
+  ctx.fillStyle='#1F3864'; ctx.fillRect(kiri, 9*DPR, 11*DPR, 9*DPR);
+  ctx.fillStyle='#48566B'; ctx.fillText('BBM keluar (L)', kiri+17*DPR, 13.5*DPR);
+  const cc = ctx.measureText('BBM keluar (L)').width;
+  ctx.fillStyle='#E24A1A'; ctx.fillRect(kiri+cc+38*DPR, 9*DPR, 11*DPR, 9*DPR);
+  ctx.fillStyle='#48566B'; ctx.fillText('BBM masuk (L)', kiri+cc+55*DPR, 13.5*DPR);
+  ctx.textAlign='right'; ctx.fillStyle='#7A8699';
+  ctx.fillText('Puncak keluar '+ltr(maxK)+' L', W-kanan, 13.5*DPR);
+  if(kaki) kaki.textContent = `${harian.length} hari dengan catatan · skala sampai ${ltr(atasSkala)} L`;
+}
+// Digambar ulang saat jendela berubah ukuran supaya grafik tidak terpotong.
+let tundaGraf = null;
+window.addEventListener('resize', ()=>{ clearTimeout(tundaGraf);
+  tundaGraf = setTimeout(()=>{ if($('tab-rekap').style.display==='') muatRekap(); }, 220); });
+
+/* ---------- master ---------- */
+async function muatMaster(){
+  const r = await api('/api/master'); S.master = r;
+  $('dlAlat').innerHTML = opsi(r.unit,'no_lambung');
+  $('dlDriver').innerHTML = opsi(r.driver,'nama');
+  $('dlLokasi').innerHTML = opsi(r.location,'nama');
+  $('dlAkt').innerHTML = opsi(r.activity,'nama');
+  $('nUnit').textContent = r.unit.length; $('nDriver').textContent = r.driver.length;
+  $('nAkt').textContent = r.activity.length; $('nLok').textContent = r.location.length;
+  $('tblUnit').innerHTML = `<thead><tr><th>No Lambung</th><th>Tipe</th><th>Vendor</th><th class="n">Tangki</th><th></th></tr></thead><tbody>` +
+    r.unit.map(x=>`<tr><td>${esc(x.no_lambung)}</td><td>${esc(x.tipe)}</td><td>${esc(x.vendor)}</td><td class="n">${ltr(x.kapasitas)}</td>
+    <td><button class="btn sm ghost" onclick="formMaster('unit',${x.id})">Edit</button></td></tr>`).join('') + '</tbody>';
+  $('tblDriver').innerHTML = `<thead><tr><th>Nama</th><th>Jabatan</th><th></th></tr></thead><tbody>` +
+    r.driver.map(x=>`<tr><td>${esc(x.nama)}</td><td>${esc(x.jabatan)}</td>
+    <td><button class="btn sm ghost" onclick="formMaster('driver',${x.id})">Edit</button></td></tr>`).join('') + '</tbody>';
+  const satu = (arr, kind) => `<thead><tr><th>Nama</th><th></th></tr></thead><tbody>` + arr.map(x=>
+    `<tr><td>${esc(x.nama)}</td><td><button class="btn sm ghost" onclick="formMaster('${kind}',${x.id})">Edit</button></td></tr>`).join('') + '</tbody>';
+  $('tblActivity').innerHTML = satu(r.activity, 'activity');
+  $('tblLocation').innerHTML = satu(r.location, 'location');
+}
+function formMaster(kind, id){
+  const jenis = {unit:'Alat / Unit', driver:'Driver / OPT', activity:'Aktivitas', location:'Lokasi'}[kind];
+  const d = id ? (S.master[kind]||[]).find(x=>x.id===id) || {} : {};
+  const isi = kind==='unit' ? `
+    <div class="grid2"><div><label>No Lambung *</label><input name="no_lambung" value="${esc(d.no_lambung||'')}" required></div>
+    <div><label>Tipe Alat</label><input name="tipe" value="${esc(d.tipe||'')}"></div>
+    <div><label>Vendor</label><input name="vendor" value="${esc(d.vendor||'')}"></div>
+    <div><label>Kapasitas Tangki (Ltr)</label><input type="number" step="1" name="kapasitas" value="${d.kapasitas||''}"></div></div>`
+    : kind==='driver' ? `
+    <div class="grid3"><div><label>Nama *</label><input name="nama" value="${esc(d.nama||'')}" required></div>
+    <div><label>Jabatan</label><input name="jabatan" value="${esc(d.jabatan||'OPT')}"></div>
+    <div><label>Telepon</label><input name="telepon" value="${esc(d.telepon||'')}"></div></div>`
+    : `<div><label>Nama *</label><input name="nama" value="${esc(d.nama||'')}" required></div>`;
+  $('modalBox').className = 'box kecil';
+  $('modalBox').innerHTML = `<h3>Tambah / Ubah ${jenis}</h3><form onsubmit="simpanMaster(event,'${kind}',${id||0})">
+    ${isi}<div class="baris" style="margin-top:12px"><button class="btn ok" type="submit">Simpan</button>
+    <button class="btn ghost" type="button" onclick="tutup()">Batal</button>
+    ${id?`<button class="btn merah" type="button" onclick="hapusMaster('${kind}',${id})">Hapus</button>`:''}</div></form>`;
+  buka();
+}
+async function simpanMaster(ev, kind, id){
+  ev.preventDefault(); const o={}; new FormData(ev.target).forEach((v,k)=>o[k]=v); if(id) o.id=id;
+  try{ await api('/api/master/'+kind, {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(o)});
+    tutup(); toast('Master tersimpan'); muatMaster(); }catch(e){ toast(e.message,true); }
+}
+async function hapusMaster(kind, id){ if(!confirm('Hapus item master ini?')) return;
+  try{ await api('/api/master/'+kind+'/'+id, {method:'DELETE'}); tutup(); muatMaster(); toast('Dihapus'); }catch(e){ toast(e.message,true); } }
+
+/* ---------- admin ---------- */
+async function muatAdmin(){
+  const s = S.settings; $('sInstansi').value=s.nama_instansi||''; $('sHarga').value=s.harga_default||0; $('sStok').value=s.stok_awal||0;
+  if(S.user.role!=='admin'){ $('tabAdmin').innerHTML='<div class="panel">Hanya admin yang dapat membuka menu ini.</div>'; return; }
+  const r = await api('/api/users');
+  $('tblUser').innerHTML = `<thead><tr><th>Username</th><th>Nama</th><th>Peran</th><th>Status</th><th></th></tr></thead><tbody>` +
+    r.rows.map(u=>`<tr><td>${esc(u.username)}</td><td>${esc(u.nama)}</td><td>${esc(u.role)}</td>
+    <td>${u.aktif?'Aktif':'Nonaktif'}</td>
+    <td>${u.username==='admin'?'':`<button class="btn sm ghost" onclick="resetPass(${u.id})">Reset sandi</button>
+    <button class="btn sm merah" onclick="hapusUser(${u.id})">Hapus</button>`}</td></tr>`).join('')+'</tbody>';
+}
+async function simpanSetting(){ try{
+  await api('/api/settings',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(
+    {nama_instansi:$('sInstansi').value, harga_default:$('sHarga').value, stok_awal:$('sStok').value})});
+  S.settings = (await api('/api/saya')).settings; isiHargaDefault(); toast('Pengaturan disimpan'); muat(); }catch(e){ toast(e.message,true); } }
+async function tambahUser(){ try{ await api('/api/users',{method:'POST',headers:{'Content-Type':'application/json'},
+  body:JSON.stringify({username:$('uNama').value, nama:$('uTampil').value, password:$('uPass').value, role:$('uRole').value})});
+  $('uNama').value=$('uTampil').value=$('uPass').value=''; muatAdmin(); toast('Pengguna ditambahkan'); }catch(e){ toast(e.message,true); } }
+async function resetPass(id){ const p=prompt('Password baru:'); if(!p) return;
+  await api('/api/users/'+id,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({password:p})}); toast('Password diubah'); }
+async function hapusUser(id){ if(!confirm('Hapus pengguna ini?')) return;
+  try{ await api('/api/users/'+id,{method:'DELETE'}); muatAdmin(); }catch(e){ toast(e.message,true); } }
+async function backup(){ const r=await api('/api/backup'); toast('Backup: backup/'+r.file); }
+async function muatLog(){ const r=await api('/api/log?limit=150');
+  $('tblLog').innerHTML = `<thead><tr><th>Waktu</th><th>User</th><th>Aksi</th><th>Detail</th></tr></thead><tbody>` +
+  r.rows.map(x=>`<tr><td>${esc(x.waktu)}</td><td>${esc(x.user)}</td><td>${esc(x.aksi)}</td><td>${esc(x.detail)}</td></tr>`).join('')+'</tbody>'; }
+
+/* ---------- modal & umum ---------- */
+function buka(){ $('modal').classList.add('buka'); }
+function tutup(){ $('modal').classList.remove('buka'); }
+$('modal').onclick = e => { if(e.target.id==='modal') tutup(); };
+function bukaPengaturan(){ pindahTab('admin'); }
+function keluar(){ api('/api/logout',{method:'POST'}).then(()=>location.href='/login'); }
+
+/* ---------- pintasan keyboard ---------- */
+document.addEventListener('keydown', e => {
+  if(e.key==='Escape'){ tutup(); return; }
+  if(e.key==='Enter' && (e.ctrlKey || e.metaKey)){ simpanInput(); return; }
+  if(e.altKey && e.key==='1'){ e.preventDefault(); pilihJenis('keluar'); $('iLiter').focus(); }
+  if(e.altKey && e.key==='2'){ e.preventDefault(); pilihJenis('masuk'); $('iLiter').focus(); }
+});
+['iLiter','iHarga'].forEach(id => { const el=$(id); el.addEventListener('input', hitungNilai); });
+$('iTanggal').addEventListener('change', ()=>{ $('iTanggal').blur(); });
+
+(async function mulai(){
+  const r = await api('/api/saya').catch(()=>null);
+  if(!r || !r.user){ location.href='/login'; return; }
+  S.user = r.user; S.settings = r.settings;
+  $('chipUser').textContent = r.user.nama + ' (' + r.user.role + ')';
+  const bulan = new Date().toISOString().slice(0,7);
+  $('fBulan').value = bulan; $('rBulan').value = ''; $('xBulan').value = bulan;
+  $('iTanggal').value = new Date().toISOString().slice(0,10);
+  pilihJenis('keluar'); isiHargaDefault();
+  await muatMaster(); await muat(); muatRekap();
+  setInterval(()=>{ if($('tab-input').style.display==='') muat(); }, 60000);
+})();
+</script>
+</body>
+</html>

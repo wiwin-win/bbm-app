@@ -1,0 +1,19 @@
+{
+  "name": "Monitoring BBM & Alat — PT Gembira Anggun Setia",
+  "short_name": "BBM Alat",
+  "description": "Catat pemakaian BBM/solar per alat dari HP atau PC, tarik datanya ke Excel.",
+  "start_url": "/m",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#152A4E",
+  "theme_color": "#1F3864",
+  "lang": "id",
+  "categories": ["business", "productivity", "utilities"],
+  "icons": [
+    {"src": "/static/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any"},
+    {"src": "/static/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any"},
+    {"src": "/static/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable"},
+    {"src": "/static/logo.png", "sizes": "208x104", "type": "image/png", "purpose": "any"}
+  ]
+}

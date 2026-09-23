@@ -1,0 +1,598 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
+<title>Input BBM — HP</title>
+<link rel="manifest" href="/manifest.webmanifest">
+<link rel="icon" href="/static/favicon.ico" sizes="any">
+<link rel="apple-touch-icon" href="/static/icon-192.png">
+<meta name="theme-color" content="#1F3864">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<link rel="stylesheet" href="/static/gaya-hp.css">
+<link rel="stylesheet" href="/static/gaya-hp-neu.css">
+</head>
+<body>
+<header>
+  <span class="plat"><img src="/static/logo.png" alt="Logo"></span>
+  <div class="mrek">
+    <h1 id="hJudul">INPUT BBM / SOLAR</h1>
+    <div class="sub" id="hSub">-</div>
+  </div>
+  <div class="kanan" id="hLencana"></div>
+</header>
+<div class="tab"><a class="aktif" data-t="in">Input</a><a data-t="data">Data</a><a data-t="rek">Rekap</a><a data-t="xl">Excel</a><a data-t="set">Siapkan</a></div>
+
+<div id="vIn">
+  <div id="vStatus" class="status" style="display:none"></div>
+  <div class="form">
+    <div class="seg"><button id="jenisKeluar" class="on keluar" onclick="pilihJenis('keluar')">BBM KELUAR</button>
+    <button id="jenisMasuk" class="masuk" onclick="pilihJenis('masuk')">BBM MASUK</button></div>
+
+    <div class="bidang utam">
+      <label>Jumlah Liter</label>
+      <input type="number" step="0.01" min="0" inputmode="decimal" id="iLiter" class="besar" placeholder="0">
+      <span class="satuan">LITER</span>
+    </div>
+    <div class="liter-cepat" id="literCepat"></div>
+
+    <div class="grid2" style="margin-top:12px">
+      <div><label>Tanggal</label><input type="date" id="iTanggal"></div>
+      <div><label>Harga / Liter (Rp)</label><input type="number" step="1" min="0" id="iHarga" inputmode="numeric"></div>
+    </div>
+    <label>Alat / No Lambung</label><input id="iAlat" list="dlAlat" autocomplete="off" placeholder="ketik alat">
+    <label>Nama OPT / Driver</label><input id="iDriver" list="dlDriver" autocomplete="off" placeholder="ketik nama">
+    <label>Deskripsi Aktivitas</label><input id="iAktivitas" list="dlAkt" autocomplete="off" placeholder="mis. MAINTENANCE JALAN">
+    <label>Lokasi Kegiatan</label><input id="iLokasi" list="dlLokasi" autocomplete="off" placeholder="mis. PT GAS">
+    <label>Keterangan (opsional)</label><textarea id="iKet" rows="2"></textarea>
+    <div class="nilai">Nilai input ini: <b id="kNilai">Rp 0</b></div>
+  </div>
+  <div class="aksi">
+    <button class="btn ghost" onclick="bersihkan()">Bersih</button>
+    <button class="btn ok" id="bSimpan" onclick="simpan()">SIMPAN</button>
+    <button class="btn ghost" style="flex:0 0 auto;padding:15px 16px" onclick="keluar()">&#9211;</button>
+  </div>
+</div>
+
+<div id="vData" style="display:none">
+  <div class="form" style="padding-bottom:0">
+    <div class="grid2">
+      <div><label>Dari</label><input type="date" id="dDari"></div>
+      <div><label>Sampai</label><input type="date" id="dSampai"></div>
+    </div>
+    <div class="grid3" style="margin-top:10px">
+      <button class="btn ghost" onclick="rentang('hari')">Hari ini</button>
+      <button class="btn ghost" onclick="rentang('minggu')">7 hari</button>
+      <button class="btn ghost" onclick="rentang('bulan')">Bulan ini</button>
+    </div>
+    <div style="margin-top:9px"><button class="btn" onclick="muatData()">Tampilkan Data</button></div>
+  </div>
+  <div class="daftar" id="listData"></div>
+</div>
+
+<div id="vRek" style="display:none">
+  <div class="form" style="padding-bottom:0">
+    <label>Bulan</label><input type="month" id="mBulan">
+    <div style="margin-top:10px" class="grid2">
+      <button class="btn" onclick="muatRek()">Tampilkan</button>
+      <button class="btn ghost" onclick="kirimWA()">Laporan WA</button>
+    </div>
+  </div>
+  <div class="kartu" id="kartu"></div>
+  <div class="daftar" id="listRek"></div>
+</div>
+
+<div id="vXl" style="display:none">
+  <div class="form">
+    <label>Periode data yang mau ditarik</label>
+    <div id="pillWrap"></div>
+    <div class="grid2">
+      <div><label>Dari tanggal</label><input type="date" id="xDari"></div>
+      <div><label>Sampai tanggal</label><input type="date" id="xSampai"></div>
+    </div>
+    <div id="xInfo" class="catatan" style="padding:10px 0 0"></div>
+    <div style="margin-top:10px" class="grid2">
+      <button class="btn" onclick="tarikExcel(false)">Simpan Excel</button>
+      <button class="btn ok" onclick="tarikExcel(true)">Bagikan / Kirim</button>
+    </div>
+    <div style="margin-top:9px"><button class="btn ghost" onclick="kirimWA()">Kirim ringkasan ke WhatsApp</button></div>
+    <div class="catatan" style="padding:12px 0 0">
+      File Excel dibuat <b>di HP ini</b> dari data yang ada di HP — tidak butuh laptop.<br><br>
+      "Simpan Excel" menyimpan ke folder Download. "Bagikan / Kirim" langsung mengirim
+      lewat WhatsApp / email / Drive.<br><br>
+      Isi 2 sheet: BBM (rincian) dan REKAP (per alat / lokasi / driver).
+    </div>
+  </div>
+
+  <div class="kotak">
+    <label style="margin-top:0">Perbarui data dari file Excel (kirim ke komputer)</label>
+    <div class="catatan" style="padding:0 0 9px">
+      Pilih file .xlsx / .xlsm dari HP (mis. hasil kiriman WhatsApp). Isinya
+      ditambahkan ke data di server. Butuh alamat server terisi &amp; WiFi nyala.
+    </div>
+    <input type="file" id="fileXlHP" accept=".xlsx,.xlsm" style="display:none" onchange="unggahExcelHP(this)">
+    <div class="grid2">
+      <button class="btn ghost" onclick="pilihFileXl()">Pilih File Excel</button>
+      <button class="btn ghost" onclick="bukaTemplate()">Unduh Template</button>
+    </div>
+    <label style="display:flex;align-items:center;gap:8px;margin-top:10px;text-transform:none;letter-spacing:0;font-weight:600;font-size:13px">
+      <input type="checkbox" id="xKosongkan" style="width:auto"> kosongkan data lama dulu
+    </label>
+    <div id="hasilUnggahHP" class="catatan" style="padding:10px 0 0"></div>
+  </div>
+
+  <div class="kotak">
+    <label style="margin-top:0">Yang sudah di server</label>
+    <div id="infoServerXl" class="catatan" style="padding:0">Menghubungi server&hellip;</div>
+    <div style="margin-top:10px"><button class="btn ghost" onclick="cekServerXl()">Perbarui Info</button></div>
+  </div>
+</div>
+
+<div id="vSet" style="display:none">
+  <div class="form">
+    <button class="btn" onclick="sinkronPenuh()">Sinkron dengan Server</button>
+    <div id="infoSinkron" class="catatan" style="padding:10px 0 0"></div>
+  </div>
+  <div class="kotak">
+    <label style="margin-top:0">Alamat server (komputer)</label>
+    <input id="sServer" placeholder="http://192.168.1.59:8791">
+    <div style="margin-top:9px" class="grid2">
+      <button class="btn" onclick="simpanServer()">Simpan Alamat</button>
+      <button class="btn ghost" onclick="hapusSemua()">Hapus Data HP</button>
+    </div>
+  </div>
+  <div class="kotak">
+    <label style="margin-top:0">Ringkasan tersimpan di HP</label>
+    <div id="infoLokal" class="catatan"></div>
+  </div>
+  <div class="kotak">
+    <div class="catatan" style="margin-bottom:9px">Berkas satu-file (bisa dipakai walau laptop mati & tak ada WiFi):</div>
+    <button class="btn ghost" onclick="unduhMandiri()">Muat Versi Mandiri (1 file)</button>
+    <div class="catatan" style="padding:9px 0 0" id="infoMandiri"></div>
+  </div>
+</div>
+
+<datalist id="dlAlat"></datalist><datalist id="dlDriver"></datalist>
+<datalist id="dlLokasi"></datalist><datalist id="dlAkt"></datalist>
+<div class="pesan" id="pesan"></div>
+
+<script src="/static/xlsx.js"></script>
+<script>
+const $ = i => document.getElementById(i);
+const esc = s => String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const ltr = v => (Number(v)||0).toLocaleString('id-ID',{maximumFractionDigits:2});
+const rp = v => 'Rp '+(Number(v)||0).toLocaleString('id-ID',{maximumFractionDigits:0});
+const K_DATA='bbm_data', K_MASTER='bbm_master', K_SET='bbm_set', K_SERVER='bbm_server', K_META='bbm_meta';
+
+let jenis='keluar', PERIODE='bulan', S={};
+function simpanLS(k,v){ try{ localStorage.setItem(k, JSON.stringify(v)); }catch(e){ toast('Penyimpanan HP penuh', true); } }
+function bacaLS(k,d){ try{ const v=JSON.parse(localStorage.getItem(k)); return v==null?d:v; }catch(e){ return d; } }
+
+/* ---------- alamat server ---------- */
+// Kalau halaman dibuka DARI server, alamatnya sudah jelas dari location.origin —
+// tidak masuk akal minta diisi manual. Alamat manual hanya perlu di berkas
+// mandiri (mode file:) atau saat server pindah alamat.
+function serverURL(){
+  const manual = (bacaLS(K_SERVER,'')||'').replace(/\/+$/,'');
+  if(manual) return manual;
+  return sedangMandiri() ? '' : location.origin.replace(/\/+$/,'');
+}
+function serverOtomatis(){ return !(bacaLS(K_SERVER,'')||'').trim() && !sedangMandiri(); }
+function alamatApi(jalur){ return serverURL() + jalur; }
+function sedangMandiri(){ return location.protocol==='file:'; }
+
+/* ---------- simpanan lokal ---------- */
+function dataLokal(){ return bacaLS(K_DATA, []); }
+function setDataLokal(a){ simpanLS(K_DATA, a); }
+function masterLokal(){ return bacaLS(K_MASTER, {unit:[],driver:[],location:[],activity:[]}); }
+function setMasterLokal(m){ simpanLS(K_MASTER, m); }
+function settingLokal(){ return bacaLS(K_SET, {nama_instansi:'INPUT BBM', harga_default:17200, stok_awal:0}); }
+function setSettingLokal(s){ simpanLS(K_SET, s); }
+function meta(){ return bacaLS(K_META, {sinkron_terakhir:'', user:null}); }
+function setMeta(m){ simpanLS(K_META, m); }
+function belongsBelumTerkirim(){ return dataLokal().filter(x=>x._sinkron!==true); }
+
+function toast(m,e){ const p=$('pesan'); p.textContent=m; p.className='pesan tampil'+(e===true?' err':(e==='info'?' info':'')); setTimeout(()=>p.className='pesan',3200); }
+function kunciBaru(){ return 'hp-' + Date.now().toString(36) + '-' + Math.random().toString(36).slice(2,10); }
+function api(u,o){
+  const alamat = sedangMandiri() ? alamatApi(u) : u;
+  // tolak secara async (bukan throw langsung) supaya pemanggil yang pakai
+  // .catch() tetap aman walau alamat server belum diisi
+  if(!alamat) return Promise.reject(new Error('Alamat server belum diisi (tab Siapkan)'));
+  return fetch(alamat,o).then(async r=>{ const t=await r.text(); let j; try{j=JSON.parse(t)}catch(_){j={detail:t}} if(!r.ok) throw new Error(j.detail||('HTTP '+r.status)); return j; });
+}
+function pilihJenis(j){
+  jenis=j;
+  $('jenisKeluar').className = j==='keluar'?'on keluar':'';
+  $('jenisMasuk').className = j==='masuk'?'on masuk':'masuk';
+  const c = j==='keluar' ? [20,50,100,200] : [1000,2000,4900];
+  $('literCepat').innerHTML = c.map(v=>`<button class="pil-angka" onclick="isiLiter(${v})">${ltr(v)} L</button>`).join('');
+  hitungNilai();
+}
+function isiLiter(v){ $('iLiter').value=v; hitungNilai(); }
+function hitungNilai(){
+  const l=parseFloat($('iLiter').value||0), h=parseFloat($('iHarga').value||0)||(settingLokal().harga_default||0);
+  $('kNilai').textContent = rp(l*h);
+}
+
+/* ---------- status ---------- */
+function lencana(){
+  const n = belongsBelumTerkirim().length;
+  const bagian = [];
+  if(n) bagian.push(`<span class="lencana">${n} belum terkirim</span>`);
+  else bagian.push('<span class="lencana hijau">semua terkirim</span>');
+  if(!navigator.onLine) bagian.push('<span class="lencana merah">tanpa sinyal</span>');
+  $('hLencana').innerHTML = bagian.join('');
+  const st=$('vStatus');
+  if(n||!navigator.onLine){
+    st.style.display='';
+    st.innerHTML = (n? `<b>${n} data masih di HP ini</b> — akan terkirim sendiri saat ada sinyal.` : '')
+      + (!navigator.onLine? ' <b>Tanpa sinyal:</b> data baru disimpan di HP, input tetap jalan.' : '')
+      + ' <a href="#" onclick="sinkronPenuh();return false;">Sinkron sekarang</a>';
+  } else st.style.display='none';
+}
+
+/* ---------- sinkron ---------- */
+async function sinkronPenuh(){
+  if(sedangMandiri() && !serverURL()){ toast('Isi alamat server dulu di tab Siapkan', true); return; }
+  let terkirim=0, gagal=0;
+  for(const o of dataLokal().filter(x=>x._sinkron!==true)){
+    const {_sinkron,_lokal,_urut,_kunci,...kirim} = o;
+    try{
+      const r = await api('/api/entries',{method:'POST',headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({...kirim, kunci:_kunci})});
+      o._sinkron = true; o.id = r.id || o.id; terkirim++;
+    }catch(e){ gagal++; }
+  }
+  setDataLokal(dataLokal());               // simpan penanda _sinkron
+  try{
+    const m = await api('/api/master'); setMasterLokal(m);
+    const sy = await api('/api/saya');
+    if(sy && sy.settings) setSettingLokal(sy.settings);
+    if(sy && sy.user) setMeta({...meta(), user:sy.user});
+    const total = (await api('/api/entries?limit=1')).total;
+    const semua = await api('/api/entries?limit='+Math.max(total,1));
+    const lokalBelum = dataLokal().filter(x=>x._sinkron!==true);
+    // kunci yang sudah ada di server dibuang dari daftar lokal -> tidak dobel
+    const kunciServer = new Set(semua.rows.map(r=>r.kunci).filter(Boolean));
+    const bersih = lokalBelum.filter(x=>!x._kunci || !kunciServer.has(x._kunci));
+    setDataLokal(semua.rows.map(r=>({...r,_sinkron:true})).concat(bersih));
+    setMeta({...meta(), sinkron_terakhir:new Date().toISOString()});
+    toast(terkirim? `${terkirim} data terkirim & data terbaru ditarik` : 'Sudah sinkron dengan server');
+  }catch(e){
+    toast(gagal? `${gagal} data belum terkirim (server tidak terjangkau)`
+               : 'Server tidak terjangkau — data tetap aman di HP', true);
+  }
+  lencana(); isiInfo(); muatMasterKeDatalist();
+  if($('vData').style.display==='') muatData();
+}
+
+/* ---------- input ---------- */
+async function simpan(){
+  const ltr_ = parseFloat($('iLiter').value||0);
+  if(!ltr_ || ltr_<=0) return toast('Isi jumlah liter dulu', true);
+  const tgl = $('iTanggal').value;
+  if(!tgl) return toast('Tanggal belum diisi', true);
+  const alat = $('iAlat').value.trim();
+  if(jenis==='keluar' && !alat) return toast('Alat / No Lambung wajib untuk BBM keluar', true);
+  const s = settingLokal();
+  const o = { tanggal:tgl, driver:$('iDriver').value.trim(), no_lambung:alat,
+              aktivitas:$('iAktivitas').value.trim(), lokasi:$('iLokasi').value.trim(),
+              keluar: jenis==='keluar'? ltr_ : 0, masuk: jenis==='masuk'? ltr_ : 0,
+              harga: parseFloat($('iHarga').value||0) || s.harga_default || 0,
+              keterangan:$('iKet').value.trim(), _sinkron:false, _lokal:true,
+              _kunci:kunciBaru(), _urut: Date.now() };
+  // 1) SELALU simpan di HP dulu -> input tak pernah gagal walau laptop/ wifi mati
+  const a = dataLokal(); a.push(o); setDataLokal(a);
+  tambahKeMasterLokal(o);
+  toast('Tersimpan di HP: '+ltr_+' L');
+  if(navigator.vibrate) navigator.vibrate(40);
+  $('iLiter').value=''; $('iKet').value=''; hitungNilai();
+  lencana(); isiInfo(); muatMasterKeDatalist();
+  if($('vData').style.display==='') muatData();
+  // 2) coba kirim ke server (kalau ada)
+  try{
+    const {_sinkron,_lokal,_urut,_kunci,...kirim} = o;
+    const r = await api('/api/entries',{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({...kirim, kunci:_kunci})});
+    o._sinkron = true; o.id = r.id;
+    const b = dataLokal(); const i = b.findIndex(x=>x._urut===o._urut); if(i>=0) b[i]=o; setDataLokal(b);
+    lencana();
+  }catch(e){ /* tetap di HP, akan dikirim saat sinkron */ }
+}
+function bersihkan(){ ['iLiter','iKet'].forEach(i=>$(i).value=''); hitungNilai(); $('iLiter').focus(); }
+function keluar(){
+  // di mode mandiri (atau server mati) tidak perlu menunggu server
+  if(sedangMandiri() || !serverURL()){ location.href='/login?m=1'; return; }
+  api('/api/logout',{method:'POST'}).catch(()=>{}).finally(()=>location.href='/login?m=1'); }
+
+function tambahKeMasterLokal(o){
+  const m = masterLokal();
+  const tambah=(k,v)=>{ if(v && !m[k].some(x=>x.nama===v||x.no_lambung===v)) m[k].push(k==='unit'?{no_lambung:v}:{nama:v}); };
+  tambah('unit', o.no_lambung); tambah('driver', o.driver);
+  tambah('location', o.lokasi); tambah('activity', o.aktivitas);
+  setMasterLokal(m);
+}
+function muatMasterKeDatalist(){
+  const m = masterLokal();
+  const op=(a,k)=>a.map(x=>`<option value="${esc(x[k])}">`).join('');
+  $('dlAlat').innerHTML=op(m.unit,'no_lambung'); $('dlDriver').innerHTML=op(m.driver,'nama');
+  $('dlLokasi').innerHTML=op(m.location,'nama'); $('dlAkt').innerHTML=op(m.activity,'nama');
+}
+
+/* ---------- lihat data ---------- */
+function saring(dari,sampai){
+  return dataLokal().filter(x=>(!dari||x.tanggal>=dari)&&(!sampai||x.tanggal<=sampai))
+    .sort((a,b)=> a.tanggal===b.tanggal ? (a._urut||a.id||0)-(b._urut||b.id||0) : (a.tanggal<b.tanggal?-1:1));
+}
+function muatData(){
+  const dari=$('dDari').value, sampai=$('dSampai').value;
+  const rows = saring(dari,sampai).reverse();
+  const k = rows.reduce((a,x)=>a+(Number(x.keluar)||0),0), m = rows.reduce((a,x)=>a+(Number(x.masuk)||0),0);
+  let html = '';
+  const belum = belongsBelumTerkirim().length;
+  if(belum) html += `<div class="item antre"><b>${belum} data belum terkirim</b><div class="r">Tersimpan aman di HP. Sinkron saat ada WiFi.</div></div>`;
+  html += `<div style="font-weight:700;margin:2px 0 8px">${rows.length} baris &middot; keluar ${ltr(k)} L &middot; masuk ${ltr(m)} L</div>`;
+  html += rows.slice(0,300).map(x=>`<div class="item"><span class="l">${Number(x.keluar)?'-'+ltr(x.keluar)+' L':'+'+ltr(x.masuk)+' L'}</span>
+     <b>${esc(x.no_lambung||'-')}</b>${x._sinkron===true?'':'<span class="lencana">di HP</span>'}
+     <div class="r">${esc(x.tanggal)} &middot; ${esc(x.driver||'-')}</div>
+     <div class="r">${esc(x.aktivitas||'')}${x.lokasi?' &middot; '+esc(x.lokasi):''}</div></div>`).join('');
+  if(!rows.length) html += '<div class="item">Belum ada data pada periode ini.</div>';
+  $('listData').innerHTML = html;
+}
+function muatRek(){
+  const bulan = $('mBulan').value;
+  const rows = saring(bulan? bulan+'-01':'', bulan? bulan+'-31':'');
+  const s = settingLokal();
+  const k = rows.reduce((a,x)=>a+(Number(x.keluar)||0),0);
+  const m = rows.reduce((a,x)=>a+(Number(x.masuk)||0),0);
+  const biaya = rows.reduce((a,x)=>a+(Number(x.keluar)||0)*(Number(x.harga)||0),0);
+  const awal = Number(s.stok_awal)||0;
+  // Sisa stok di HP = saldo sampai akhir periode yang dipilih (dihitung dari
+  // seluruh data HP, bukan cuma baris dalam bulan ini) supaya tidak tampil minus.
+  const sampaiAkhir = (x)=> (x.tanggal||'').slice(0,10) <= (bulan? bulan+'-31' : '9999-12-31');
+  const semuaHP = dataLokal();
+  const kumK = semuaHP.filter(sampaiAkhir).reduce((a,x)=>a+(Number(x.keluar)||0),0);
+  const kumM = semuaHP.filter(sampaiAkhir).reduce((a,x)=>a+(Number(x.masuk)||0),0);
+  const grup = (kunci)=>{
+    const g={}; rows.forEach(x=>{ const n=(x[kunci]||'(kosong)').trim()||'(kosong)';
+      g[n]=g[n]||{keluar:0,biaya:0}; g[n].keluar+=Number(x.keluar)||0; g[n].biaya+=(Number(x.keluar)||0)*(Number(x.harga)||0); });
+    return Object.entries(g).sort((a,b)=>b[1].keluar-a[1].keluar);
+  };
+  $('kartu').innerHTML = `<div><span>Keluar (periode)</span><b>${ltr(k)} L</b></div>
+    <div><span>Masuk (periode)</span><b>${ltr(m)} L</b></div>
+    <div><span>Sisa Stok s/d ${bulan? esc(bulan) : 'sekarang'}</span><b>${ltr(awal+kumM-kumK)} L</b></div>
+    <div><span>Biaya</span><b>${rp(biaya)}</b></div>`;
+  $('listRek').innerHTML = grup('lokasi').map(([n,v])=>`<div class="item"><span class="l">${ltr(v.keluar)} L</span>
+     <b>${esc(n)}</b><div class="r">${rp(v.biaya)}</div></div>`).join('')
+     + (rows.length? '' : '<div class="item">Tidak ada data pada bulan ini.</div>');
+}
+
+/* ---------- tarik ke Excel (dibuat di HP) ---------- */
+const PIL = [['hari','Hari ini'],['minggu','7 hari'],['bulan','Bulan ini'],['lalu','Bulan lalu'],['semua','Semua data']];
+const iso = d => new Date(d.getTime()-d.getTimezoneOffset()*60000).toISOString().slice(0,10);
+function gambarPill(){
+  $('pillWrap').innerHTML = PIL.map(([k,l])=>`<span class="pill${PERIODE===k?' on':''}" onclick="pilihPeriode('${k}')">${l}</span>`).join('');
+}
+function pilihPeriode(k){
+  PERIODE=k; gambarPill();
+  const f=new Date(), d=new Date();
+  if(k==='hari'){}
+  else if(k==='minggu'){ d.setDate(d.getDate()-6); }
+  else if(k==='bulan'){ d.setDate(1); }
+  else if(k==='lalu'){ d=new Date(f.getFullYear(), f.getMonth()-1, 1); f.setDate(0); }
+  else { $('xDari').value=''; $('xSampai').value=''; muatExcel(); return; }
+  $('xDari').value=iso(d); $('xSampai').value=iso(f); muatExcel();
+}
+function muatExcel(){
+  const dari=$('xDari').value, sampai=$('xSampai').value;
+  const rows = saring(dari,sampai);
+  const belum = rows.filter(x=>x._sinkron!==true).length;
+  if(!rows.length){ $('xInfo').innerHTML='Tidak ada data pada periode ini. Ubah tanggal / periode.'; return; }
+  const k = rows.reduce((a,x)=>a+(Number(x.keluar)||0),0);
+  const m = rows.reduce((a,x)=>a+(Number(x.masuk)||0),0);
+  $('xInfo').innerHTML = `Siap ditarik: <b>${rows.length} baris</b> &middot; keluar ${ltr(k)} L &middot; masuk ${ltr(m)} L`
+    + (belum? `<br><span style="color:#8a6d00"><b>${belum} baris belum terkirim ke server</b> — tetap ikut masuk file ini.</span>`:'');
+}
+async function tarikExcel(bagikan){
+  const dari=$('xDari').value, sampai=$('xSampai').value;
+  const rows = saring(dari,sampai);
+  if(!rows.length) return toast('Tidak ada data untuk ditarik', true);
+  let hasil;
+  try{
+    hasil = BBMXlsx.buatLaporan(rows, settingLokal(),
+      (dari||sampai)? `${dari||'awal'} s/d ${sampai||'sekarang'}` : 'Semua data');
+  }catch(e){ return toast('Gagal membuat Excel: '+e.message, true); }
+  const file = new File([hasil.blob], hasil.namaBerkas,
+    {type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'});
+  if(bagikan && navigator.canShare && navigator.canShare({files:[file]})){
+    try{ await navigator.share({files:[file], title:'Data BBM', text:'Data BBM '+hasil.namaBerkas});
+         toast('File terkirim'); return; }catch(e){ /* user batal -> lanjut simpan */ }
+  }
+  try{
+    const url = URL.createObjectURL(hasil.blob);
+    const a = document.createElement('a'); a.href=url; a.download=hasil.namaBerkas;
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(()=>URL.revokeObjectURL(url), 5000);
+    toast(bagikan? 'Tersimpan di folder Download: '+hasil.namaBerkas : 'Tersimpan: '+hasil.namaBerkas);
+  }catch(e){ toast('Gagal menyimpan file: '+e.message, true); }
+}
+
+/* ---------- perbarui data dari Excel (kirim ke server) ---------- */
+function pilihFileXl(){ $('fileXlHP').click(); }
+function bukaTemplate(){
+  const alamat = serverURL();
+  if(!alamat) return toast('Isi dulu alamat server di bawah', true);
+  window.open(alamat.replace(/\/+$/,'') + '/api/template/excel', '_blank');
+}
+async function unggahExcelHP(inp){
+  const f = inp.files && inp.files[0]; inp.value='';
+  if(!f) return;
+  const nama = (f.name||'').toLowerCase();
+  if(!/\.(xlsx|xlsm)$/.test(nama)) return toast('Pilih file .xlsx / .xlsm', true);
+  const alamat = serverURL();
+  if(!alamat) return toast('Isi dulu alamat server (tab Siapkan)', true);
+  const info = $('hasilUnggahHP');
+  info.innerHTML = 'Mengirim <b>'+esc(f.name)+'</b> ('+Math.round(f.size/1024)+' KB) ke server&hellip;';
+  const fd = new FormData();
+  fd.append('file', f);
+  fd.append('kosongkan', $('xKosongkan').checked ? '1' : '0');
+  $('xKosongkan').checked = false;
+  try{
+    const r = await fetch(alamat.replace(/\/+$/,'') + '/api/import/excel',
+                          {method:'POST', body:fd, credentials:'include'});
+    if(!r.ok){
+      const j = await r.json().catch(()=>({}));
+      if(r.status===401) throw new Error('Harus login dulu di server (buka '+alamat+'/m, masuk, lalu ulangi)');
+      throw new Error(j.detail || ('HTTP '+r.status));
+    }
+    const d = await r.json();
+    info.innerHTML = `<b>Berhasil diperbarui</b><br>${d.baris} baris terbaca (${esc(d.dari)} s/d ${esc(d.sampai)})`
+      + (d.kosongkan? ' &middot; data lama dikosongkan':'')
+      + `<br>Master baru: ${d.alat_baru||0} alat, ${d.driver_baru||0} driver, ${d.lokasi_baru||0} lokasi, ${d.aktivitas_baru||0} aktivitas.`;
+    toast('Data diperbarui: '+d.baris+' baris');
+    cekServerXl();
+  }catch(e){
+    info.innerHTML = '<b>Gagal mengirim</b><br>'+esc(e.message);
+    toast('Unggah gagal: '+e.message, true);
+  }
+}
+async function cekServerXl(){
+  const alamat = serverURL(); const info = $('infoServerXl');
+  if(!alamat){
+    info.innerHTML = '<b>Alamat server belum diisi.</b> Buka tab <b>Siapkan</b> lalu isi alamat'
+      + ' komputer (mis. http://192.168.1.10:8791) supaya data HP bisa dikirim.';
+    return;
+  }
+  try{
+    const r = await fetch(alamat.replace(/\/+$/,'') + '/api/ringkasan', {credentials:'include'});
+    if(!r.ok) throw new Error(r.status===401? 'perlu login' : 'HTTP '+r.status);
+    const d = (await r.json()).data || {};
+    info.innerHTML = `Tersimpan di server bulan ${esc(d.bulan||'ini')}: <b>${ltr(d.baris)} baris</b>`
+      + ` &middot; keluar ${ltr(d.keluar)} L &middot; masuk ${ltr(d.masuk)} L`
+      + `<br>Sisa stok ${ltr(d.sisa_stok)} L &middot; nilai ${rp(d.biaya)}`
+      + (serverOtomatis() ? `<br><span style="color:var(--txt-3)">Alamat ${esc(alamat)} dipakai otomatis `
+         + `karena halaman ini dibuka dari server.</span>` : '');
+  }catch(e){
+    info.innerHTML = '<b>Server tidak terjangkau</b> ('+esc(e.message)+'). Cek WiFi &amp; alamat server,'
+      + ' atau buka '+esc(alamat)+'/m lalu login.';
+  }
+}
+function teksLaporan(){
+  const dari=$('xDari').value, sampai=$('xSampai').value;
+  let rows = saring(dari,sampai);
+  if(!rows.length && $('mBulan').value) rows = saring($('mBulan').value+'-01', $('mBulan').value+'-31');
+  const s = settingLokal(), awal=Number(s.stok_awal)||0;
+  const k=rows.reduce((a,x)=>a+(Number(x.keluar)||0),0), m=rows.reduce((a,x)=>a+(Number(x.masuk)||0),0);
+  const biaya=rows.reduce((a,x)=>a+(Number(x.keluar)||0)*(Number(x.harga)||0),0);
+  const g={}; rows.forEach(x=>{ const n=(x.lokasi||'(kosong)').trim()||'(kosong)';
+    g[n]=g[n]||{k:0,b:0}; g[n].k+=Number(x.keluar)||0; g[n].b+=(Number(x.keluar)||0)*(Number(x.harga)||0); });
+  const garis = '--------------------------------';
+  let t = `*LAPORAN BBM / SOLAR*\n${s.nama_instansi||''}\nPeriode: ${dari||sampai? (dari||'awal')+' s/d '+(sampai||'sekarang') : 'Semua data'}\n${garis}\n`;
+  t += `Stok awal   : ${ltr(awal)} L\nBBM masuk   : ${ltr(m)} L\nBBM keluar  : ${ltr(k)} L\nSisa stok   : ${ltr(awal+m-k)} L\nNilai keluar: ${rp(biaya)}\nJumlah data : ${rows.length} baris\n`;
+  const lok = Object.entries(g).sort((a,b)=>b[1].k-a[1].k);
+  if(lok.length){ t += `\n*Rincian per Lokasi*\n`; lok.forEach(([n,v])=>{ t += `- ${n}: ${ltr(v.k)} L (${rp(v.b)})\n`; }); }
+  const belum = rows.filter(x=>x._sinkron!==true).length;
+  if(belum) t += `\nCatatan: ${belum} baris masih tersimpan di HP (belum tersinkron).\n`;
+  return t;
+}
+async function kirimWA(){
+  const teks = teksLaporan() + `\n(File Excel lengkap: menu Excel > Simpan Excel di aplikasi)`;
+  if(navigator.share){ try{ await navigator.share({text:teks}); toast('Dibagikan'); return; }catch(e){} }
+  try{ await navigator.clipboard.writeText(teks); toast('Ringkasan disalin — tempel di WhatsApp'); }
+  catch(e){
+    const t=document.createElement('textarea'); t.value=teks; document.body.appendChild(t); t.select();
+    try{ document.execCommand('copy'); toast('Ringkasan disalin ke clipboard'); }catch(_){ toast('Salin manual dari layar', true); }
+    document.body.removeChild(t);
+  }
+}
+function rentang(mode){
+  const d=new Date(), f=new Date();
+  if(mode==='minggu') d.setDate(d.getDate()-6); else if(mode==='bulan') d.setDate(1);
+  $('dDari').value=iso(d); $('dSampai').value=iso(f); muatData();
+}
+
+/* ---------- siapkan / mandiri ---------- */
+function isiInfo(){
+  const n = dataLokal().length, belum = belongsBelumTerkirim().length, mt = meta();
+  $('infoSinkron').innerHTML = (serverURL()? 'Server: <b>'+esc(serverURL())+'</b>' : '<b>Alamat server belum diisi.</b> Isi di bawah supaya data bisa dikirim ke komputer.')
+    + '<br>Terakhir sinkron: ' + (mt.sinkron_terakhir? new Date(mt.sinkron_terakhir).toLocaleString('id-ID') : 'belum pernah');
+  $('infoLokal').innerHTML = `Total ${n} baris tersimpan di HP &middot; ${belum} belum terkirim`
+    + (mt.user? `<br>Login terakhir: ${esc(mt.user.nama||mt.user.username)}`:'');
+  $('sServer').value = serverURL() || (sedangMandiri()? '' : location.origin);
+  if(sedangMandiri()) $('infoMandiri').innerHTML = 'Mode mandiri: buka tab Siapkan > isi alamat server, lalu Sinkron untuk menggabungkan data ke aplikasi di komputer.';
+}
+function simpanServer(){
+  let v = $('sServer').value.trim().replace(/\/+$/,'');
+  if(v && !/^https?:\/\//i.test(v)) v = 'http://'+v;
+  simpanLS(K_SERVER, v); isiInfo(); toast('Alamat server disimpan');
+  sinkronPenuh();
+}
+function hapusSemua(){
+  if(!confirm('Hapus SEMUA data yang tersimpan di HP ini?\n(Data di komputer tidak terhapus)')) return;
+  ['bbm_data','bbm_master','bbm_meta','bbm_antre'].forEach(k=>localStorage.removeItem(k));
+  toast('Data di HP dihapus'); lencana(); isiInfo();
+  if($('vData').style.display==='') muatData();
+}
+async function unduhMandiri(){
+  const alamat = (sedangMandiri()? '' : location.origin);
+  try{
+    const r = await fetch(alamat + '/unduh/bbm-hp.html');
+    if(!r.ok) throw new Error('HTTP '+r.status);
+    const blob = await r.blob();
+    const file = new File([blob], 'bbm-hp-mandiri.html', {type:'text/html'});
+    if(navigator.canShare && navigator.canShare({files:[file]})){
+      await navigator.share({files:[file], title:'Aplikasi BBM HP'}); toast('Terkirim — buka file itu dari WhatsApp'); return;
+    }
+    const url=URL.createObjectURL(blob); const a=document.createElement('a');
+    a.href=url; a.download='bbm-hp-mandiri.html'; document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(()=>URL.revokeObjectURL(url),5000);
+    toast('Tersimpan di Download: bbm-hp-mandiri.html');
+    $('infoMandiri').innerHTML = 'File ada di folder Download. Buka dengan Chrome (tap file > Buka dengan Chrome). Bisa dipakai walau laptop mati & tanpa WiFi.';
+  }catch(e){ toast('Gagal mengambil file mandiri: '+e.message, true); }
+}
+
+document.querySelectorAll('.tab a').forEach(a=>a.onclick=()=>{
+  document.querySelectorAll('.tab a').forEach(x=>x.classList.remove('aktif')); a.classList.add('aktif');
+  ['in','data','rek','xl','set'].forEach(t=> $('v'+t.charAt(0).toUpperCase()+t.slice(1)).style.display = a.dataset.t===t?'':'none');
+  if(a.dataset.t==='data') muatData();
+  if(a.dataset.t==='rek') muatRek();
+  if(a.dataset.t==='xl'){ muatExcel(); cekServerXl(); }
+  if(a.dataset.t==='set') isiInfo();
+});
+
+['iLiter','iHarga'].forEach(i => $(i).addEventListener('input', hitungNilai));
+
+(async function(){
+  const t=new Date(); t.setDate(1); $('mBulan').value=t.toISOString().slice(0,7);
+  $('iTanggal').value = iso(new Date());
+  gambarPill(); pilihPeriode('bulan');
+  // login (kalau memang online & bukan mode mandiri)
+  if(!sedangMandiri()){
+    try{
+      const r = await api('/api/saya');
+      if(r && r.user){ S=r.settings; setSettingLokal(r.settings); setMeta({...meta(), user:r.user}); }
+      else { location.href='/login?m=1'; return; }
+    }catch(e){
+      if(!dataLokal().length){ location.href='/login?m=1'; return; }   // belum pernah login & tak ada data
+    }
+    $('hJudul').textContent = (settingLokal().nama_instansi||'INPUT BBM').slice(0,40);
+    const mu = meta().user; $('hSub').textContent = mu? ('Login: '+(mu.nama||mu.username)+((mu.role==='admin')?' (admin)':'')) : 'Mode mandiri (data di HP)';
+  } else {
+    $('hJudul').textContent = (settingLokal().nama_instansi||'INPUT BBM').slice(0,40);
+    $('hSub').textContent = 'Versi mandiri — data disimpan di HP ini';
+  }
+  $('iHarga').value = settingLokal().harga_default||0;
+  muatMasterKeDatalist(); lencana(); isiInfo();
+  if(!sedangMandiri()){
+    await sinkronPenuh();
+    if(navigator.serviceWorker) navigator.serviceWorker.register('/sw.js').catch(()=>{});
+  }
+  window.addEventListener('online', ()=>{ toast('Sinyal kembali — mengirim data...','info'); sinkronPenuh(); lencana(); });
+  window.addEventListener('offline', ()=>{ lencana(); toast('Tanpa sinyal — data disimpan di HP','info'); });
+  document.addEventListener('visibilitychange', ()=>{ if(!document.hidden){ lencana(); } });
+})();
+</script>
+</body>
+</html>

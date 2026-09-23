@@ -1,0 +1,791 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
+<title>Input BBM — HP</title>
+
+
+<meta name="theme-color" content="#1F3864">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<style>
+:root{--navy:#1F3864;--line:#d5dce6;--bg:#f2f5fa;--ok:#1a7f4b;--err:#b3261e;--warn:#e0a800}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{margin:0;font-family:Segoe UI,Roboto,Arial,sans-serif;background:var(--bg);color:#12233b;font-size:15px;padding-bottom:118px}
+header{background:var(--navy);color:#fff;padding:11px 14px;position:sticky;top:0;z-index:20}
+header h1{margin:0;font-size:15px}
+header .sub{font-size:11.5px;opacity:.92;margin-top:2px}
+header .kanan{float:right;text-align:right}
+.form{padding:12px}
+label{display:block;font-size:11px;font-weight:700;color:#5a6a85;text-transform:uppercase;margin:10px 0 4px}
+input,select,textarea{width:100%;padding:13px 12px;font-size:16px;border:1px solid var(--line);border-radius:10px;background:#fff}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+.grid3 button{padding:11px 4px;font-size:12.5px}
+.besar{font-size:22px!important;font-weight:700}
+.aksi{position:fixed;left:0;right:0;bottom:0;background:#fff;border-top:1px solid var(--line);padding:10px 12px;display:flex;gap:9px;z-index:30}
+.btn{flex:1;padding:15px;border:0;border-radius:11px;font-size:16px;font-weight:700;background:var(--navy);color:#fff}
+.btn.ok{background:var(--ok)}.btn.ghost{background:#fff;color:var(--navy);border:1px solid var(--line)}
+.btn:disabled{opacity:.55}
+.tab{display:flex;background:#fff;border-bottom:1px solid var(--line);position:sticky;top:56px;z-index:19}
+.tab a{flex:1;text-align:center;padding:11px 2px;font-weight:700;color:#5a6a85;font-size:12.5px}
+.tab a.aktif{color:var(--navy);border-bottom:3px solid var(--navy)}
+.daftar{padding:10px 12px}
+.item{background:#fff;border:1px solid var(--line);border-radius:11px;padding:10px 12px;margin-bottom:9px}
+.item b{font-size:15px}.item .r{color:#667;font-size:12.5px;margin-top:2px}
+.item .l{float:right;text-align:right}
+.item.antre{border-color:var(--warn);background:#fffdf3}
+.kartu{display:grid;grid-template-columns:1fr 1fr;gap:9px;padding:12px}
+.kartu div{background:#fff;border:1px solid var(--line);border-radius:10px;padding:9px 12px}
+.kartu span{display:block;font-size:10.5px;color:#667;text-transform:uppercase}
+.kartu b{font-size:17px}
+.pesan{position:fixed;left:12px;right:12px;bottom:100px;background:#12233b;color:#fff;padding:13px;border-radius:11px;text-align:center;font-weight:600;opacity:0;transition:.25s;z-index:50}
+.pesan.tampil{opacity:1}.pesan.err{background:var(--err)}.pesan.info{background:#0b5cab}
+.seg{display:flex;gap:8px;margin-top:6px}
+.seg button{flex:1;padding:14px;border-radius:10px;border:1px solid var(--line);background:#fff;font-size:15px;font-weight:700;color:#5a6a85}
+.seg button.on{background:var(--navy);color:#fff;border-color:var(--navy)}
+.pill{display:inline-block;background:#e8eef8;color:var(--navy);border-radius:20px;padding:6px 11px;font-size:12px;font-weight:700;margin:0 6px 6px 0}
+.pill.on{background:var(--navy);color:#fff}
+.catatan{font-size:12px;color:#5a6a85}
+.lencana{display:inline-block;background:var(--warn);color:#3a2c00;border-radius:20px;padding:3px 9px;font-size:11px;font-weight:700;margin-left:6px}
+.lencana.hijau{background:#9fe0b8;color:#08381c}
+.lencana.merah{background:#f5b7b1;color:#5c1208}
+.status{padding:9px 12px;font-size:12.5px;background:#e8eef8;color:#1F3864;border-bottom:1px solid var(--line)}
+.kotak{background:#fff;border:1px solid var(--line);border-radius:11px;padding:11px;margin:0 12px 10px}
+</style>
+</head>
+<body>
+<header>
+  <div class="kanan" id="hLencana"></div>
+  <h1 id="hJudul">INPUT BBM / SOLAR</h1>
+  <div class="sub" id="hSub">-</div>
+</header>
+<div class="tab"><a class="aktif" data-t="in">Input</a><a data-t="data">Data</a><a data-t="rek">Rekap</a><a data-t="xl">Excel</a><a data-t="set">Siapkan</a></div>
+
+<div id="vIn">
+  <div id="vStatus" class="status" style="display:none"></div>
+  <div class="form">
+    <div class="seg"><button id="jenisKeluar" class="on" onclick="pilihJenis('keluar')">BBM KELUAR</button>
+    <button id="jenisMasuk" onclick="pilihJenis('masuk')">BBM MASUK</button></div>
+    <div class="grid2" style="margin-top:10px">
+      <div><label>Tanggal</label><input type="date" id="iTanggal"></div>
+      <div><label>Liter</label><input type="number" step="0.01" inputmode="decimal" id="iLiter" class="besar" placeholder="0"></div>
+    </div>
+    <label>Nama OPT / Driver</label><input id="iDriver" list="dlDriver" autocomplete="off" placeholder="ketik nama">
+    <label>Alat / No Lambung</label><input id="iAlat" list="dlAlat" autocomplete="off" placeholder="ketik alat">
+    <label>Deskripsi Aktivitas</label><input id="iAktivitas" list="dlAkt" autocomplete="off" placeholder="mis. MAINTENANCE JALAN">
+    <label>Lokasi Kegiatan</label><input id="iLokasi" list="dlLokasi" autocomplete="off" placeholder="mis. PT GAS">
+    <label>Harga / Liter (Rp)</label><input type="number" id="iHarga" inputmode="numeric">
+    <label>Keterangan (opsional)</label><textarea id="iKet" rows="2"></textarea>
+  </div>
+  <div class="aksi">
+    <button class="btn ghost" onclick="bersihkan()">Bersih</button>
+    <button class="btn ok" id="bSimpan" onclick="simpan()">SIMPAN</button>
+    <button class="btn ghost" style="flex:0 0 auto;padding:15px 16px" onclick="keluar()">⏻</button>
+  </div>
+</div>
+
+<div id="vData" style="display:none">
+  <div class="form" style="padding-bottom:0">
+    <div class="grid2">
+      <div><label>Dari</label><input type="date" id="dDari"></div>
+      <div><label>Sampai</label><input type="date" id="dSampai"></div>
+    </div>
+    <div class="grid3" style="margin-top:10px">
+      <button class="btn ghost" onclick="rentang('hari')">Hari ini</button>
+      <button class="btn ghost" onclick="rentang('minggu')">7 hari</button>
+      <button class="btn ghost" onclick="rentang('bulan')">Bulan ini</button>
+    </div>
+    <div style="margin-top:9px"><button class="btn" onclick="muatData()">Tampilkan Data</button></div>
+  </div>
+  <div class="daftar" id="listData"></div>
+</div>
+
+<div id="vRek" style="display:none">
+  <div class="form" style="padding-bottom:0">
+    <label>Bulan</label><input type="month" id="mBulan">
+    <div style="margin-top:10px" class="grid2">
+      <button class="btn" onclick="muatRek()">Tampilkan</button>
+      <button class="btn ghost" onclick="kirimWA()">Laporan WA</button>
+    </div>
+  </div>
+  <div class="kartu" id="kartu"></div>
+  <div class="daftar" id="listRek"></div>
+</div>
+
+<div id="vXl" style="display:none">
+  <div class="form">
+    <label>Periode data yang mau ditarik</label>
+    <div id="pillWrap"></div>
+    <div class="grid2">
+      <div><label>Dari tanggal</label><input type="date" id="xDari"></div>
+      <div><label>Sampai tanggal</label><input type="date" id="xSampai"></div>
+    </div>
+    <div id="xInfo" class="catatan" style="padding:10px 0 0"></div>
+    <div style="margin-top:10px" class="grid2">
+      <button class="btn" onclick="tarikExcel(false)">Simpan Excel</button>
+      <button class="btn ok" onclick="tarikExcel(true)">Bagikan / Kirim</button>
+    </div>
+    <div style="margin-top:9px"><button class="btn ghost" onclick="kirimWA()">Kirim ringkasan ke WhatsApp</button></div>
+    <div class="catatan" style="padding:12px 0 0">
+      File Excel dibuat <b>di HP ini</b> dari data yang ada di HP — tidak butuh laptop.<br><br>
+      "Simpan Excel" menyimpan ke folder Download. "Bagikan / Kirim" langsung mengirim
+      lewat WhatsApp / email / Drive.<br><br>
+      Isi 2 sheet: BBM (rincian) dan REKAP (per alat / lokasi / driver).
+    </div>
+  </div>
+</div>
+
+<div id="vSet" style="display:none">
+  <div class="form">
+    <button class="btn" onclick="sinkronPenuh()">Sinkron dengan Server</button>
+    <div id="infoSinkron" class="catatan" style="padding:10px 0 0"></div>
+  </div>
+  <div class="kotak">
+    <label style="margin-top:0">Alamat server (komputer)</label>
+    <input id="sServer" placeholder="http://192.168.1.59:8791">
+    <div style="margin-top:9px" class="grid2">
+      <button class="btn" onclick="simpanServer()">Simpan Alamat</button>
+      <button class="btn ghost" onclick="hapusSemua()">Hapus Data HP</button>
+    </div>
+  </div>
+  <div class="kotak">
+    <label style="margin-top:0">Ringkasan tersimpan di HP</label>
+    <div id="infoLokal" class="catatan"></div>
+  </div>
+  <div class="kotak">
+    <div class="catatan" style="margin-bottom:9px">Berkas satu-file (bisa dipakai walau laptop mati & tak ada WiFi):</div>
+    <button class="btn ghost" onclick="unduhMandiri()">Muat Versi Mandiri (1 file)</button>
+    <div class="catatan" style="padding:9px 0 0" id="infoMandiri"></div>
+  </div>
+</div>
+
+<datalist id="dlAlat"></datalist><datalist id="dlDriver"></datalist>
+<datalist id="dlLokasi"></datalist><datalist id="dlAkt"></datalist>
+<div class="pesan" id="pesan"></div>
+
+<script>
+/* Penulis XLSX mini — tanpa pustaka luar, jalan penuh OFFLINE di HP.
+   Dipakai halaman HP supaya data bisa ditarik ke Excel walau laptop/server mati.
+   Format: ZIP (metode "stored", tanpa kompresi) + XML SpreadsheetML. */
+
+(function (global) {
+  "use strict";
+
+  var TABEL_CRC = (function () {
+    var t = new Uint32Array(256);
+    for (var n = 0; n < 256; n++) {
+      var c = n;
+      for (var k = 0; k < 8; k++) c = (c & 1) ? (0xEDB88320 ^ (c >>> 1)) : (c >>> 1);
+      t[n] = c >>> 0;
+    }
+    return t;
+  })();
+
+  function crc32(buf) {
+    var c = 0xFFFFFFFF;
+    for (var i = 0; i < buf.length; i++) c = TABEL_CRC[(c ^ buf[i]) & 0xFF] ^ (c >>> 8);
+    return (c ^ 0xFFFFFFFF) >>> 0;
+  }
+
+  function bytes(s) { return new TextEncoder().encode(s); }
+
+  /* ---------- ZIP sederhana (stored) ---------- */
+  function zipStored(daftar) {
+    // daftar: [{name, data:Uint8Array}] -> Uint8Array
+    var tglDos = ((2026 - 1980) << 9) | (1 << 5) | 1;      // 2026-01-01
+    var jamDos = 0;
+    var lokal = [], pusat = [], offset = 0;
+
+    daftar.forEach(function (f) {
+      var nama = bytes(f.name), data = f.data, crc = crc32(data);
+      var lh = new Uint8Array(30 + nama.length);
+      var v = new DataView(lh.buffer);
+      v.setUint32(0, 0x04034b50, true);
+      v.setUint16(4, 20, true);          // versi minimum
+      v.setUint16(6, 0x0800, true);      // nama file UTF-8
+      v.setUint16(8, 0, true);           // metode 0 = stored
+      v.setUint16(10, jamDos, true);
+      v.setUint16(12, tglDos, true);
+      v.setUint32(14, crc, true);
+      v.setUint32(18, data.length, true);
+      v.setUint32(22, data.length, true);
+      v.setUint16(26, nama.length, true);
+      v.setUint16(28, 0, true);
+      lh.set(nama, 30);
+      lokal.push(lh, data);
+
+      var ch = new Uint8Array(46 + nama.length);
+      var w = new DataView(ch.buffer);
+      w.setUint32(0, 0x02014b50, true);
+      w.setUint16(4, 20, true);
+      w.setUint16(6, 20, true);
+      w.setUint16(8, 0x0800, true);
+      w.setUint16(10, 0, true);
+      w.setUint16(12, jamDos, true);
+      w.setUint16(14, tglDos, true);
+      w.setUint32(16, crc, true);
+      w.setUint32(20, data.length, true);
+      w.setUint32(24, data.length, true);
+      w.setUint16(28, nama.length, true);
+      w.setUint32(42, offset, true);     // offset local header
+      ch.set(nama, 46);
+      pusat.push(ch);
+
+      offset += lh.length + data.length;
+    });
+
+    var ukuranPusat = pusat.reduce(function (a, b) { return a + b.length; }, 0);
+    var eocd = new Uint8Array(22);
+    var e = new DataView(eocd.buffer);
+    e.setUint32(0, 0x06054b50, true);
+    e.setUint16(8, daftar.length, true);
+    e.setUint16(10, daftar.length, true);
+    e.setUint32(12, ukuranPusat, true);
+    e.setUint32(16, offset, true);
+
+    var total = offset + ukuranPusat + 22, out = new Uint8Array(total), p = 0;
+    lokal.concat(pusat, [eocd]).forEach(function (b) { out.set(b, p); p += b.length; });
+    return out;
+  }
+
+  /* ---------- XML ---------- */
+  function xesc(s) {
+    return String(s == null ? "" : s)
+      .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;").replace(/\x00-\x08|\x0B|\x0C|\x0E-\x1F/g, "");
+  }
+
+  function kolomKeHuruf(n) {                 // 1 -> A, 27 -> AA
+    var s = "";
+    while (n > 0) { var m = (n - 1) % 26; s = String.fromCharCode(65 + m) + s; n = (n - 1 - m) / 26; }
+    return s;
+  }
+
+  function sel(rujuk, nilai) {
+    if (nilai === null || nilai === undefined || nilai === "") return "";
+    if (typeof nilai === "number" && isFinite(nilai)) {
+      return '<c r="' + rujuk + '"><v>' + nilai + "</v></c>";
+    }
+    return '<c r="' + rujuk + '" t="inlineStr"><is><t xml:space="preserve">' +
+      xesc(nilai) + "</t></is></c>";
+  }
+
+  function barisXml(no, nilai) {
+    var isi = nilai.map(function (v, i) { return sel(kolomKeHuruf(i + 1) + no, v); }).join("");
+    return '<row r="' + no + '">' + isi + "</row>";
+  }
+
+  function sheetXml(judul, barisBaris, lebar) {
+    var cols = (lebar || []).map(function (w, i) {
+      return '<col min="' + (i + 1) + '" max="' + (i + 1) + '" width="' + w + '" customWidth="1"/>';
+    }).join("");
+    var rows = barisBaris.map(function (b, i) { return barisXml(i + 1, b); }).join("");
+    return '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>' +
+      '<worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">' +
+      (cols ? "<cols>" + cols + "</cols>" : "") +
+      "<sheetData>" + rows + "</sheetData></worksheet>";
+  }
+
+  function workbookXml(namaSheet) {
+    var sheets = namaSheet.map(function (n, i) {
+      return '<sheet name="' + xesc(n) + '" sheetId="' + (i + 1) + '" r:id="rId' + (i + 1) + '"/>';
+    }).join("");
+    return '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>' +
+      '<workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" ' +
+      'xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">' +
+      "<sheets>" + sheets + "</sheets></workbook>";
+  }
+
+  function workbookRelsXml(n) {
+    var rels = "";
+    for (var i = 1; i <= n; i++) {
+      rels += '<Relationship Id="rId' + i + '" ' +
+        'Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" ' +
+        'Target="worksheets/sheet' + i + '.xml"/>';
+    }
+    rels += '<Relationship Id="rId' + (n + 1) + '" ' +
+      'Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/>';
+    return '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>' +
+      '<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">' +
+      rels + "</Relationships>";
+  }
+
+  var CONTENT_TYPES = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>' +
+    '<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">' +
+    '<Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/>' +
+    '<Default Extension="xml" ContentType="application/xml"/>' +
+    '<Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/>' +
+    '<Override PartName="/xl/worksheets/sheet1.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/>' +
+    '<Override PartName="/xl/worksheets/sheet2.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/>' +
+    '<Override PartName="/xl/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.styles+xml"/>' +
+    "</Types>";
+
+  var ROOT_RELS = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>' +
+    '<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">' +
+    '<Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="xl/workbook.xml"/>' +
+    "</Relationships>";
+
+  var STYLES = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>' +
+    '<styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">' +
+    '<fonts count="2"><font><sz val="11"/><name val="Calibri"/></font>' +
+    '<font><b/><sz val="11"/><name val="Calibri"/></font></fonts>' +
+    '<fills count="2"><fill><patternFill patternType="none"/></fill>' +
+    '<fill><patternFill patternType="gray125"/></fill></fills>' +
+    '<borders count="1"><border/></borders>' +
+    '<cellStyleXfs count="1"><xf numFmtId="0" fontId="0" fillId="0" borderId="0"/></cellStyleXfs>' +
+    '<cellXfs count="2"><xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0"/>' +
+    '<xf numFmtId="0" fontId="1" fillId="0" borderId="0" xfId="0" applyFont="1"/></cellXfs>' +
+    "</styleSheet>";
+
+  /* ---------- API utama ---------- */
+  function buatXlsx(sheet1, sheet2) {
+    var berkas = [
+      { name: "[Content_Types].xml", data: bytes(CONTENT_TYPES) },
+      { name: "_rels/.rels", data: bytes(ROOT_RELS) },
+      { name: "xl/workbook.xml", data: bytes(workbookXml([sheet1.nama, sheet2.nama])) },
+      { name: "xl/_rels/workbook.xml.rels", data: bytes(workbookRelsXml(2)) },
+      { name: "xl/styles.xml", data: bytes(STYLES) },
+      { name: "xl/worksheets/sheet1.xml", data: bytes(sheetXml(sheet1.nama, sheet1.baris, sheet1.lebar)) },
+      { name: "xl/worksheets/sheet2.xml", data: bytes(sheetXml(sheet2.nama, sheet2.baris, sheet2.lebar)) }
+    ];
+    return zipStored(berkas);
+  }
+
+  var KEPALA = ["NO", "BULAN", "TANGGAL", "NAMA OPT / DRIVER", "ALAT / NO LAMBUNG",
+    "DESKRIPSI AKTIVITAS", "LOKASI KEGIATAN", "BBM / LTR (KELUAR)", "BBM MASUK (LTR)",
+    "HARGA / LTR (RP)", "SISA STOK (LTR)", "NILAI BBM KELUAR (RP)",
+    "NILAI BBM MASUK (RP)", "KETERANGAN"];
+  var LEBAR = [5, 11, 12, 20, 26, 24, 18, 14, 14, 14, 14, 18, 18, 26];
+
+  var BULAN_ID = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli",
+    "Agustus", "September", "Oktober", "November", "Desember"];
+
+  function namaBulan(tgl) {
+    var m = /^(\d{4})-(\d{2})/.exec(String(tgl || ""));
+    return m ? (BULAN_ID[parseInt(m[2], 10) - 1] + " " + m[1]) : "";
+  }
+
+  function angka(v) { var n = Number(v); return isFinite(n) ? n : 0; }
+
+  /**
+   * Buat workbook dari daftar baris BBM.
+   * setting: {nama_instansi, stok_awal, periode}
+   * hasil: {blob, namaBerkas, totalBaris, totalKeluar, totalMasuk, biaya}
+   */
+  function buatLaporan(rows, setting, judulPeriode) {
+    setting = setting || {};
+    var awal = angka(setting.stok_awal);
+    var baris = [], saldo = awal, keluar = 0, masuk = 0, biaya = 0;
+    var perAlat = {}, perLokasi = {}, perDriver = {};
+
+    var urut = rows.slice().sort(function (a, b) {
+      if (a.tanggal !== b.tanggal) return a.tanggal < b.tanggal ? -1 : 1;
+      return angka(a._urut) - angka(b._urut);
+    });
+
+    urut.forEach(function (r, i) {
+      var k = angka(r.keluar), m = angka(r.masuk), h = angka(r.harga);
+      saldo += m - k; keluar += k; masuk += m; biaya += k * h;
+      baris.push([i + 1, namaBulan(r.tanggal), r.tanggal, r.driver || "", r.no_lambung || "",
+        r.aktivitas || "", r.lokasi || "", k, m, h, Math.round(saldo * 100) / 100,
+        k * h, m * h, r.keterangan || ""]);
+      [["alat", r.no_lambung], ["lokasi", r.lokasi], ["driver", r.driver]].forEach(function (p) {
+        var map = p[0] === "alat" ? perAlat : (p[0] === "lokasi" ? perLokasi : perDriver);
+        var nama = (p[1] || "(kosong)").trim() || "(kosong)";
+        if (!map[nama]) map[nama] = { keluar: 0, biaya: 0, baris: 0 };
+        map[nama].keluar += k; map[nama].biaya += k * h; map[nama].baris += 1;
+      });
+    });
+
+    var judul = (setting.nama_instansi || "MONITORING BBM") + " — PENCATATAN BBM / SOLAR";
+    var lembar1 = [
+      [judul],
+      ["Periode: " + (judulPeriode || "Semua data")],
+      [],
+      KEPALA
+    ].concat(baris);
+    lembar1.push([]);
+    lembar1.push(["TOTAL", baris.length + " baris", "", "", "", "", "", keluar, masuk, "",
+      Math.round(saldo * 100) / 100, biaya, "", ""]);
+
+    var tukangUrut = function (map, namaKolom) {
+      return Object.keys(map).map(function (n) {
+        return [n, map[n].baris, Math.round(map[n].keluar * 100) / 100, map[n].biaya];
+      }).sort(function (a, b) { return b[2] - a[2]; });
+    };
+    var lembar2 = [
+      ["REKAP " + judul],
+      ["Periode: " + (judulPeriode || "Semua data")],
+      [],
+      ["Stok awal (L)", awal],
+      ["Total masuk (L)", masuk],
+      ["Total keluar (L)", keluar],
+      ["Sisa stok (L)", Math.round(saldo * 100) / 100],
+      ["Total nilai keluar (Rp)", biaya],
+      ["Jumlah baris", baris.length],
+      [],
+      ["PER ALAT", "", "", ""],
+      ["ALAT / NO LAMBUNG", "Jumlah baris", "BBM keluar (L)", "Nilai (Rp)"]
+    ].concat(tukangUrut(perAlat))
+      .concat([[], ["PER LOKASI", "", "", ""],
+        ["LOKASI KEGIATAN", "Jumlah baris", "BBM keluar (L)", "Nilai (Rp)"]])
+      .concat(tukangUrut(perLokasi))
+      .concat([[], ["PER DRIVER", "", "", ""],
+        ["NAMA OPT / DRIVER", "Jumlah baris", "BBM keluar (L)", "Nilai (Rp)"]])
+      .concat(tukangUrut(perDriver));
+
+    var data = buatXlsx({ nama: "BBM", baris: lembar1, lebar: LEBAR },
+      { nama: "REKAP", baris: lembar2, lebar: [28, 13, 16, 18] });
+
+    var tgl = new Date().toISOString().slice(0, 10);
+    return {
+      blob: new Blob([data], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" }),
+      namaBerkas: "BBM_HP_" + tgl + ".xlsx",
+      totalBaris: baris.length, totalKeluar: keluar, totalMasuk: masuk, biaya: biaya,
+      sisaStok: Math.round(saldo * 100) / 100
+    };
+  }
+
+  global.BBMXlsx = { buatLaporan: buatLaporan, buatXlsx: buatXlsx, KEPALA: KEPALA };
+})(typeof window !== "undefined" ? window : globalThis);
+
+</script>
+<script>
+const $ = i => document.getElementById(i);
+const esc = s => String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const ltr = v => (Number(v)||0).toLocaleString('id-ID',{maximumFractionDigits:2});
+const rp = v => 'Rp '+(Number(v)||0).toLocaleString('id-ID',{maximumFractionDigits:0});
+const K_DATA='bbm_data', K_MASTER='bbm_master', K_SET='bbm_set', K_SERVER='bbm_server', K_META='bbm_meta';
+
+let jenis='keluar', PERIODE='bulan', S={};
+function simpanLS(k,v){ try{ localStorage.setItem(k, JSON.stringify(v)); }catch(e){ toast('Penyimpanan HP penuh', true); } }
+function bacaLS(k,d){ try{ const v=JSON.parse(localStorage.getItem(k)); return v==null?d:v; }catch(e){ return d; } }
+
+/* ---------- alamat server ---------- */
+function serverURL(){ return (bacaLS(K_SERVER,'')||'').replace(/\/+$/,''); }
+function alamatApi(jalur){ return serverURL() + jalur; }
+function sedangMandiri(){ return location.protocol==='file:'; }
+
+/* ---------- simpanan lokal ---------- */
+function dataLokal(){ return bacaLS(K_DATA, []); }
+function setDataLokal(a){ simpanLS(K_DATA, a); }
+function masterLokal(){ return bacaLS(K_MASTER, {unit:[],driver:[],location:[],activity:[]}); }
+function setMasterLokal(m){ simpanLS(K_MASTER, m); }
+function settingLokal(){ return bacaLS(K_SET, {nama_instansi:'INPUT BBM', harga_default:17200, stok_awal:0}); }
+function setSettingLokal(s){ simpanLS(K_SET, s); }
+function meta(){ return bacaLS(K_META, {sinkron_terakhir:'', user:null}); }
+function setMeta(m){ simpanLS(K_META, m); }
+function belongsBelumTerkirim(){ return dataLokal().filter(x=>x._sinkron!==true); }
+
+function toast(m,e){ const p=$('pesan'); p.textContent=m; p.className='pesan tampil'+(e===true?' err':(e==='info'?' info':'')); setTimeout(()=>p.className='pesan',3200); }
+function api(u,o){
+  const alamat = sedangMandiri() ? alamatApi(u) : u;
+  if(!alamat) throw new Error('Alamat server belum diisi (tab Siapkan)');
+  return fetch(alamat,o).then(async r=>{ const t=await r.text(); let j; try{j=JSON.parse(t)}catch(_){j={detail:t}} if(!r.ok) throw new Error(j.detail||('HTTP '+r.status)); return j; });
+}
+function pilihJenis(j){ jenis=j; $('jenisKeluar').className = j==='keluar'?'on':''; $('jenisMasuk').className = j==='masuk'?'on':''; }
+
+/* ---------- status ---------- */
+function lencana(){
+  const n = belongsBelumTerkirim().length;
+  const bagian = [];
+  if(n) bagian.push(`<span class="lencana">${n} belum terkirim</span>`);
+  else bagian.push('<span class="lencana hijau">semua terkirim</span>');
+  if(!navigator.onLine) bagian.push('<span class="lencana merah">tanpa sinyal</span>');
+  $('hLencana').innerHTML = bagian.join('');
+  const st=$('vStatus');
+  if(n||!navigator.onLine){
+    st.style.display='';
+    st.innerHTML = (n? `<b>${n} data masih di HP ini</b> — akan terkirim sendiri saat ada sinyal.` : '')
+      + (!navigator.onLine? ' <b>Tanpa sinyal:</b> data baru disimpan di HP, input tetap jalan.' : '')
+      + ' <a href="#" onclick="sinkronPenuh();return false;">Sinkron sekarang</a>';
+  } else st.style.display='none';
+}
+
+/* ---------- sinkron ---------- */
+async function sinkronPenuh(){
+  if(!serverURL() && sedangMandiri()){ toast('Isi alamat server dulu di tab Siapkan', true); return; }
+  if(!navigator.onLine && !sedangMandiri()===false){ }
+  let terkirim=0, gagal=0;
+  const sisa=[];
+  for(const o of dataLokal().filter(x=>x._sinkron!==true)){
+    const {_sinkron,_lokal,_urut,...kirim} = o;
+    try{ const r=await api('/api/entries',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(kirim)});
+         o._sinkron=true; o.id=r.id||o.id; terkirim++; }
+    catch(e){ gagal++; sisa.push(o); }
+  }
+  setDataLokal(dataLokal());   // simpan penanda _sinkron
+  try{
+    const m = await api('/api/master'); setMasterLokal(m);
+    const sy = await api('/api/saya'); if(sy && sy.settings) setSettingLokal(sy.settings); if(sy&&sy.user) setMeta({...meta(), user:sy.user});
+    const jumlah = (await api('/api/entries?limit=1')).total;
+    const semua = await api('/api/entries?limit='+Math.max(jumlah,1));
+    const lokalBelum = dataLokal().filter(x=>x._sinkron!==true);
+    const dari = semua.rows.map(r=>({...r,_sinkron:true}));
+    setDataLokal(dari.concat(lokalBelum));
+    setMeta({...(meta()), sinkron_terakhir:new Date().toISOString()});
+    toast(terkirim? `${terkirim} data terkirim & data terbaru ditarik` : 'Sudah sinkron dengan server');
+  }catch(e){
+    toast(gagal? `${gagal} data belum terkirim (server tidak terjangkau)` : 'Server tidak terjangkau — data tetap di HP', true);
+  }
+  lencana(); isiInfo(); muatMasterKeDatalist();
+  if($('vData').style.display==='') muatData();
+}
+
+/* ---------- input ---------- */
+async function simpan(){
+  const ltr_ = parseFloat($('iLiter').value||0);
+  if(!ltr_ || ltr_<=0) return toast('Isi jumlah liter dulu', true);
+  const tgl = $('iTanggal').value;
+  if(!tgl) return toast('Tanggal belum diisi', true);
+  const alat = $('iAlat').value.trim();
+  if(jenis==='keluar' && !alat) return toast('Alat / No Lambung wajib untuk BBM keluar', true);
+  const s = settingLokal();
+  const o = { tanggal:tgl, driver:$('iDriver').value.trim(), no_lambung:alat,
+              aktivitas:$('iAktivitas').value.trim(), lokasi:$('iLokasi').value.trim(),
+              keluar: jenis==='keluar'? ltr_ : 0, masuk: jenis==='masuk'? ltr_ : 0,
+              harga: parseFloat($('iHarga').value||0) || s.harga_default || 0,
+              keterangan:$('iKet').value.trim(), _sinkron:false, _lokal:true,
+              _urut: Date.now() };
+  // 1) SELALU simpan di HP dulu -> input tak pernah gagal walau laptop/ wifi mati
+  const a = dataLokal(); a.push(o); setDataLokal(a);
+  tambahKeMasterLokal(o);
+  toast('Tersimpan di HP: '+ltr_+' L');
+  if(navigator.vibrate) navigator.vibrate(40);
+  $('iLiter').value=''; $('iKet').value='';
+  lencana(); isiInfo(); muatMasterKeDatalist();
+  if($('vData').style.display==='') muatData();
+  // 2) coba kirim ke server (kalau ada)
+  try{
+    const {_sinkron,_lokal,_urut,...kirim} = o;
+    const r = await api('/api/entries',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(kirim)});
+    o._sinkron = true; o.id = r.id;
+    const b = dataLokal(); const i = b.findIndex(x=>x._urut===o._urut); if(i>=0) b[i]=o; setDataLokal(b);
+    lencana();
+  }catch(e){ /* tetap di HP, akan dikirim saat sinkron */ }
+}
+function bersihkan(){ ['iLiter','iKet'].forEach(i=>$(i).value=''); }
+function keluar(){ api('/api/logout',{method:'POST'}).catch(()=>{}).finally(()=>location.href='/login?m=1'); }
+
+function tambahKeMasterLokal(o){
+  const m = masterLokal();
+  const tambah=(k,v)=>{ if(v && !m[k].some(x=>x.nama===v||x.no_lambung===v)) m[k].push(k==='unit'?{no_lambung:v}:{nama:v}); };
+  tambah('unit', o.no_lambung); tambah('driver', o.driver);
+  tambah('location', o.lokasi); tambah('activity', o.aktivitas);
+  setMasterLokal(m);
+}
+function muatMasterKeDatalist(){
+  const m = masterLokal();
+  const op=(a,k)=>a.map(x=>`<option value="${esc(x[k])}">`).join('');
+  $('dlAlat').innerHTML=op(m.unit,'no_lambung'); $('dlDriver').innerHTML=op(m.driver,'nama');
+  $('dlLokasi').innerHTML=op(m.location,'nama'); $('dlAkt').innerHTML=op(m.activity,'nama');
+}
+
+/* ---------- lihat data ---------- */
+function saring(dari,sampai){
+  return dataLokal().filter(x=>(!dari||x.tanggal>=dari)&&(!sampai||x.tanggal<=sampai))
+    .sort((a,b)=> a.tanggal===b.tanggal ? (a._urut||a.id||0)-(b._urut||b.id||0) : (a.tanggal<b.tanggal?-1:1));
+}
+function muatData(){
+  const dari=$('dDari').value, sampai=$('dSampai').value;
+  const rows = saring(dari,sampai).reverse();
+  const k = rows.reduce((a,x)=>a+(Number(x.keluar)||0),0), m = rows.reduce((a,x)=>a+(Number(x.masuk)||0),0);
+  let html = '';
+  const belum = belongsBelumTerkirim().length;
+  if(belum) html += `<div class="item antre"><b>${belum} data belum terkirim</b><div class="r">Tersimpan aman di HP. Sinkron saat ada WiFi.</div></div>`;
+  html += `<div style="font-weight:700;margin:2px 0 8px">${rows.length} baris &middot; keluar ${ltr(k)} L &middot; masuk ${ltr(m)} L</div>`;
+  html += rows.slice(0,300).map(x=>`<div class="item"><span class="l">${Number(x.keluar)?'-'+ltr(x.keluar)+' L':'+'+ltr(x.masuk)+' L'}</span>
+     <b>${esc(x.no_lambung||'-')}</b>${x._sinkron===true?'':'<span class="lencana">di HP</span>'}
+     <div class="r">${esc(x.tanggal)} &middot; ${esc(x.driver||'-')}</div>
+     <div class="r">${esc(x.aktivitas||'')}${x.lokasi?' &middot; '+esc(x.lokasi):''}</div></div>`).join('');
+  if(!rows.length) html += '<div class="item">Belum ada data pada periode ini.</div>';
+  $('listData').innerHTML = html;
+}
+function muatRek(){
+  const bulan = $('mBulan').value;
+  const rows = saring(bulan? bulan+'-01':'', bulan? bulan+'-31':'');
+  const s = settingLokal();
+  const k = rows.reduce((a,x)=>a+(Number(x.keluar)||0),0);
+  const m = rows.reduce((a,x)=>a+(Number(x.masuk)||0),0);
+  const biaya = rows.reduce((a,x)=>a+(Number(x.keluar)||0)*(Number(x.harga)||0),0);
+  const awal = Number(s.stok_awal)||0;
+  const grup = (kunci)=>{
+    const g={}; rows.forEach(x=>{ const n=(x[kunci]||'(kosong)').trim()||'(kosong)';
+      g[n]=g[n]||{keluar:0,biaya:0}; g[n].keluar+=Number(x.keluar)||0; g[n].biaya+=(Number(x.keluar)||0)*(Number(x.harga)||0); });
+    return Object.entries(g).sort((a,b)=>b[1].keluar-a[1].keluar);
+  };
+  $('kartu').innerHTML = `<div><span>Keluar</span><b>${ltr(k)} L</b></div>
+    <div><span>Masuk</span><b>${ltr(m)} L</b></div>
+    <div><span>Sisa Stok</span><b>${ltr(awal+m-k)} L</b></div>
+    <div><span>Biaya</span><b>${rp(biaya)}</b></div>`;
+  $('listRek').innerHTML = grup('lokasi').map(([n,v])=>`<div class="item"><span class="l">${ltr(v.keluar)} L</span>
+     <b>${esc(n)}</b><div class="r">${rp(v.biaya)}</div></div>`).join('')
+     + (rows.length? '' : '<div class="item">Tidak ada data pada bulan ini.</div>');
+}
+
+/* ---------- tarik ke Excel (dibuat di HP) ---------- */
+const PIL = [['hari','Hari ini'],['minggu','7 hari'],['bulan','Bulan ini'],['lalu','Bulan lalu'],['semua','Semua data']];
+const iso = d => new Date(d.getTime()-d.getTimezoneOffset()*60000).toISOString().slice(0,10);
+function gambarPill(){
+  $('pillWrap').innerHTML = PIL.map(([k,l])=>`<span class="pill${PERIODE===k?' on':''}" onclick="pilihPeriode('${k}')">${l}</span>`).join('');
+}
+function pilihPeriode(k){
+  PERIODE=k; gambarPill();
+  const f=new Date(), d=new Date();
+  if(k==='hari'){}
+  else if(k==='minggu'){ d.setDate(d.getDate()-6); }
+  else if(k==='bulan'){ d.setDate(1); }
+  else if(k==='lalu'){ d=new Date(f.getFullYear(), f.getMonth()-1, 1); f.setDate(0); }
+  else { $('xDari').value=''; $('xSampai').value=''; muatExcel(); return; }
+  $('xDari').value=iso(d); $('xSampai').value=iso(f); muatExcel();
+}
+function muatExcel(){
+  const dari=$('xDari').value, sampai=$('xSampai').value;
+  const rows = saring(dari,sampai);
+  const belum = rows.filter(x=>x._sinkron!==true).length;
+  if(!rows.length){ $('xInfo').innerHTML='Tidak ada data pada periode ini. Ubah tanggal / periode.'; return; }
+  const k = rows.reduce((a,x)=>a+(Number(x.keluar)||0),0);
+  const m = rows.reduce((a,x)=>a+(Number(x.masuk)||0),0);
+  $('xInfo').innerHTML = `Siap ditarik: <b>${rows.length} baris</b> &middot; keluar ${ltr(k)} L &middot; masuk ${ltr(m)} L`
+    + (belum? `<br><span style="color:#8a6d00"><b>${belum} baris belum terkirim ke server</b> — tetap ikut masuk file ini.</span>`:'');
+}
+async function tarikExcel(bagikan){
+  const dari=$('xDari').value, sampai=$('xSampai').value;
+  const rows = saring(dari,sampai);
+  if(!rows.length) return toast('Tidak ada data untuk ditarik', true);
+  let hasil;
+  try{
+    hasil = BBMXlsx.buatLaporan(rows, settingLokal(),
+      (dari||sampai)? `${dari||'awal'} s/d ${sampai||'sekarang'}` : 'Semua data');
+  }catch(e){ return toast('Gagal membuat Excel: '+e.message, true); }
+  const file = new File([hasil.blob], hasil.namaBerkas,
+    {type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'});
+  if(bagikan && navigator.canShare && navigator.canShare({files:[file]})){
+    try{ await navigator.share({files:[file], title:'Data BBM', text:'Data BBM '+hasil.namaBerkas});
+         toast('File terkirim'); return; }catch(e){ /* user batal -> lanjut simpan */ }
+  }
+  try{
+    const url = URL.createObjectURL(hasil.blob);
+    const a = document.createElement('a'); a.href=url; a.download=hasil.namaBerkas;
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(()=>URL.revokeObjectURL(url), 5000);
+    toast(bagikan? 'Tersimpan di folder Download: '+hasil.namaBerkas : 'Tersimpan: '+hasil.namaBerkas);
+  }catch(e){ toast('Gagal menyimpan file: '+e.message, true); }
+}
+function teksLaporan(){
+  const dari=$('xDari').value, sampai=$('xSampai').value;
+  let rows = saring(dari,sampai);
+  if(!rows.length && $('mBulan').value) rows = saring($('mBulan').value+'-01', $('mBulan').value+'-31');
+  const s = settingLokal(), awal=Number(s.stok_awal)||0;
+  const k=rows.reduce((a,x)=>a+(Number(x.keluar)||0),0), m=rows.reduce((a,x)=>a+(Number(x.masuk)||0),0);
+  const biaya=rows.reduce((a,x)=>a+(Number(x.keluar)||0)*(Number(x.harga)||0),0);
+  const g={}; rows.forEach(x=>{ const n=(x.lokasi||'(kosong)').trim()||'(kosong)';
+    g[n]=g[n]||{k:0,b:0}; g[n].k+=Number(x.keluar)||0; g[n].b+=(Number(x.keluar)||0)*(Number(x.harga)||0); });
+  const garis = '--------------------------------';
+  let t = `*LAPORAN BBM / SOLAR*\n${s.nama_instansi||''}\nPeriode: ${dari||sampai? (dari||'awal')+' s/d '+(sampai||'sekarang') : 'Semua data'}\n${garis}\n`;
+  t += `Stok awal   : ${ltr(awal)} L\nBBM masuk   : ${ltr(m)} L\nBBM keluar  : ${ltr(k)} L\nSisa stok   : ${ltr(awal+m-k)} L\nNilai keluar: ${rp(biaya)}\nJumlah data : ${rows.length} baris\n`;
+  const lok = Object.entries(g).sort((a,b)=>b[1].k-a[1].k);
+  if(lok.length){ t += `\n*Rincian per Lokasi*\n`; lok.forEach(([n,v])=>{ t += `- ${n}: ${ltr(v.k)} L (${rp(v.b)})\n`; }); }
+  const belum = rows.filter(x=>x._sinkron!==true).length;
+  if(belum) t += `\nCatatan: ${belum} baris masih tersimpan di HP (belum tersinkron).\n`;
+  return t;
+}
+async function kirimWA(){
+  const teks = teksLaporan() + `\n(File Excel lengkap: menu Excel > Simpan Excel di aplikasi)`;
+  if(navigator.share){ try{ await navigator.share({text:teks}); toast('Dibagikan'); return; }catch(e){} }
+  try{ await navigator.clipboard.writeText(teks); toast('Ringkasan disalin — tempel di WhatsApp'); }
+  catch(e){
+    const t=document.createElement('textarea'); t.value=teks; document.body.appendChild(t); t.select();
+    try{ document.execCommand('copy'); toast('Ringkasan disalin ke clipboard'); }catch(_){ toast('Salin manual dari layar', true); }
+    document.body.removeChild(t);
+  }
+}
+function rentang(mode){
+  const d=new Date(), f=new Date();
+  if(mode==='minggu') d.setDate(d.getDate()-6); else if(mode==='bulan') d.setDate(1);
+  $('dDari').value=iso(d); $('dSampai').value=iso(f); muatData();
+}
+
+/* ---------- siapkan / mandiri ---------- */
+function isiInfo(){
+  const n = dataLokal().length, belum = belongsBelumTerkirim().length, mt = meta();
+  $('infoSinkron').innerHTML = (serverURL()? 'Server: <b>'+esc(serverURL())+'</b>' : '<b>Alamat server belum diisi.</b> Isi di bawah supaya data bisa dikirim ke komputer.')
+    + '<br>Terakhir sinkron: ' + (mt.sinkron_terakhir? new Date(mt.sinkron_terakhir).toLocaleString('id-ID') : 'belum pernah');
+  $('infoLokal').innerHTML = `Total ${n} baris tersimpan di HP &middot; ${belum} belum terkirim`
+    + (mt.user? `<br>Login terakhir: ${esc(mt.user.nama||mt.user.username)}`:'');
+  $('sServer').value = serverURL() || (sedangMandiri()? '' : location.origin);
+  if(sedangMandiri()) $('infoMandiri').innerHTML = 'Mode mandiri: buka tab Siapkan > isi alamat server, lalu Sinkron untuk menggabungkan data ke aplikasi di komputer.';
+}
+function simpanServer(){
+  let v = $('sServer').value.trim().replace(/\/+$/,'');
+  if(v && !/^https?:\/\//i.test(v)) v = 'http://'+v;
+  simpanLS(K_SERVER, v); isiInfo(); toast('Alamat server disimpan');
+  sinkronPenuh();
+}
+function hapusSemua(){
+  if(!confirm('Hapus SEMUA data yang tersimpan di HP ini?\n(Data di komputer tidak terhapus)')) return;
+  ['bbm_data','bbm_master','bbm_meta','bbm_antre'].forEach(k=>localStorage.removeItem(k));
+  toast('Data di HP dihapus'); lencana(); isiInfo();
+  if($('vData').style.display==='') muatData();
+}
+async function unduhMandiri(){
+  const alamat = (sedangMandiri()? '' : location.origin);
+  try{
+    const r = await fetch(alamat + '/unduh/bbm-hp.html');
+    if(!r.ok) throw new Error('HTTP '+r.status);
+    const blob = await r.blob();
+    const file = new File([blob], 'bbm-hp-mandiri.html', {type:'text/html'});
+    if(navigator.canShare && navigator.canShare({files:[file]})){
+      await navigator.share({files:[file], title:'Aplikasi BBM HP'}); toast('Terkirim — buka file itu dari WhatsApp'); return;
+    }
+    const url=URL.createObjectURL(blob); const a=document.createElement('a');
+    a.href=url; a.download='bbm-hp-mandiri.html'; document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(()=>URL.revokeObjectURL(url),5000);
+    toast('Tersimpan di Download: bbm-hp-mandiri.html');
+    $('infoMandiri').innerHTML = 'File ada di folder Download. Buka dengan Chrome (tap file > Buka dengan Chrome). Bisa dipakai walau laptop mati & tanpa WiFi.';
+  }catch(e){ toast('Gagal mengambil file mandiri: '+e.message, true); }
+}
+
+document.querySelectorAll('.tab a').forEach(a=>a.onclick=()=>{
+  document.querySelectorAll('.tab a').forEach(x=>x.classList.remove('aktif')); a.classList.add('aktif');
+  ['in','data','rek','xl','set'].forEach(t=> $('v'+t.charAt(0).toUpperCase()+t.slice(1)).style.display = a.dataset.t===t?'':'none');
+  if(a.dataset.t==='data') muatData();
+  if(a.dataset.t==='rek') muatRek();
+  if(a.dataset.t==='xl') muatExcel();
+  if(a.dataset.t==='set') isiInfo();
+});
+
+(async function(){
+  const t=new Date(); t.setDate(1); $('mBulan').value=t.toISOString().slice(0,7);
+  $('iTanggal').value = iso(new Date());
+  gambarPill(); pilihPeriode('bulan');
+  // login (kalau memang online & bukan mode mandiri)
+  if(!sedangMandiri()){
+    try{
+      const r = await api('/api/saya');
+      if(r && r.user){ S=r.settings; setSettingLokal(r.settings); setMeta({...meta(), user:r.user}); }
+      else { location.href='/login?m=1'; return; }
+    }catch(e){
+      if(!dataLokal().length){ location.href='/login?m=1'; return; }   // belum pernah login & tak ada data
+    }
+    $('hJudul').textContent = (settingLokal().nama_instansi||'INPUT BBM').slice(0,40);
+    const mu = meta().user; $('hSub').textContent = mu? ('Login: '+(mu.nama||mu.username)+((mu.role==='admin')?' (admin)':'')) : 'Mode mandiri (data di HP)';
+  } else {
+    $('hJudul').textContent = (settingLokal().nama_instansi||'INPUT BBM').slice(0,40);
+    $('hSub').textContent = 'Versi mandiri — data disimpan di HP ini';
+  }
+  $('iHarga').value = settingLokal().harga_default||0;
+  muatMasterKeDatalist(); lencana(); isiInfo();
+  if(!sedangMandiri()){
+    await sinkronPenuh();
+    if(navigator.serviceWorker) (function(){}).catch(()=>{});
+  }
+  window.addEventListener('online', ()=>{ toast('Sinyal kembali — mengirim data...','info'); sinkronPenuh(); lencana(); });
+  window.addEventListener('offline', ()=>{ lencana(); toast('Tanpa sinyal — data disimpan di HP','info'); });
+  document.addEventListener('visibilitychange', ()=>{ if(!document.hidden){ lencana(); } });
+})();
+</script>
+</body>
+</html>

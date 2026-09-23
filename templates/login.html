@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="id"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Masuk — Monitoring BBM &amp; Alat</title>
+<link rel="icon" href="/static/favicon.ico" sizes="any">
+<link rel="apple-touch-icon" href="/static/icon-192.png">
+<link rel="stylesheet" href="/static/gaya.css">
+<link rel="stylesheet" href="/static/gaya-neu.css">
+<meta name="theme-color" content="#1F3864">
+</head><body class="masuk">
+<form class="masuk-kotak" onsubmit="return masuk(event)">
+  <div class="masuk-plat"><img src="/static/logo.png" alt="PT Gembira Anggun Setia"></div>
+  <h1 id="judul">Monitoring BBM &amp; Alat</h1>
+  <p class="sub">Pencatatan BBM / Solar</p>
+  <div class="masuk-err" id="eri"></div>
+  <label>Username</label>
+  <input id="u" autocomplete="username" autofocus>
+  <label>Password</label>
+  <input id="p" type="password" autocomplete="current-password">
+  <button type="submit">Masuk</button>
+  <div class="masuk-kaki">Buka dari HP: tambahkan ke layar utama<br>agar seperti aplikasi</div>
+</form>
+<script>
+const $ = i => document.getElementById(i);
+async function masuk(ev){
+  ev.preventDefault();
+  const er = $('eri'); er.style.display='none';
+  const b = new URLSearchParams({username:$('u').value.trim(), password:$('p').value});
+  try{
+    const r = await fetch('/api/login', {method:'POST', body:b});
+    if(!r.ok){ const j = await r.json().catch(()=>({})); throw new Error(j.detail||'Username atau password salah'); }
+    location.href = new URLSearchParams(location.search).get('m') ? '/m' : '/';
+  }catch(e){ er.textContent = e.message; er.style.display='block'; $('p').select(); }
+}
+if(new URLSearchParams(location.search).get('m')) $('judul').textContent = 'Input BBM (HP)';
+</script>
+</body></html>

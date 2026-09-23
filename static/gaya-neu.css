@@ -1,0 +1,264 @@
+/* ==========================================================================
+   Neumorphism (Soft UI) overlay untuk bbm-app PC
+   Diterapkan di atas gaya.css dasar. Semua elemen utama dibuat "soft extruded"
+   atau "pressed" menggunakan bayangan serupa warna latar.
+   ========================================================================== */
+
+:root{
+  /* latar neumorphism: abu muda lembut */
+  --neu-bg:#E0E5EC;
+  --neu-bg-2:#EBF0F5;
+  --neu-txt:#2C3E50;
+  --neu-txt-2:#5D6D7E;
+  --neu-txt-3:#85929E;
+
+  /* bayangan neumorphism utama */
+  --neu-light:-8px -8px 16px rgba(255,255,255,.72);
+  --neu-dark: 8px 8px 16px rgba(163,177,198,.55);
+  --neu-inset-light:inset -4px -4px 8px rgba(255,255,255,.55);
+  --neu-inset-dark:inset 4px 4px 8px rgba(163,177,198,.45);
+
+  --neu-r:16px;
+  --neu-r-sm:12px;
+  --neu-r-lg:20px;
+}
+
+/* Override latar halaman */
+body{background:var(--neu-bg);color:var(--neu-txt)}
+
+/* ===== Header: tetap gelap supaya kontras merek, tapi bayangan lembut ===== */
+header{
+  background:linear-gradient(145deg,#1c3358,#162a4d);
+  box-shadow:0 8px 20px rgba(22,42,77,.35), inset 0 1px 0 rgba(255,255,255,.12);
+  border-bottom:1px solid rgba(255,255,255,.06)
+}
+.merek .plat{
+  background:var(--neu-bg);
+  border:0;
+  box-shadow:var(--neu-light),var(--neu-dark);
+}
+
+/* ===== Navigasi: chip/segmen lembut ===== */
+nav{
+  background:var(--neu-bg);
+  border-bottom:1px solid rgba(255,255,255,.35);
+  box-shadow:0 6px 14px -10px rgba(163,177,198,.55);
+}
+nav a{
+  color:var(--neu-txt-2);
+  border-radius:999px;
+  background:var(--neu-bg);
+  box-shadow:var(--neu-light),var(--neu-dark);
+  margin:2px;
+}
+nav a:hover{
+  color:var(--navy);
+  background:var(--neu-bg);
+  box-shadow:var(--neu-inset-light),var(--neu-inset-dark);
+}
+nav a.aktif{
+  color:#fff;
+  background:linear-gradient(145deg,var(--navy-terang),var(--navy));
+  box-shadow:var(--neu-light),var(--neu-dark);
+}
+
+/* ===== Panel / kartu neumorphism ===== */
+.panel,
+.kartu>div,
+.kotak-kecil,
+.wrap,
+.jatuh,
+.masuk-kotak,
+.masuk-kotak input,
+.modal .box{
+  background:var(--neu-bg);
+  border:1px solid rgba(255,255,255,.25);
+  border-radius:var(--neu-r);
+  box-shadow:var(--neu-light),var(--neu-dark);
+}
+.panel:hover,.kartu>div:hover{box-shadow:var(--neu-light),var(--neu-dark)}
+
+/* Hapus bayangan bawaan, ganti neumorphism */
+.panel{box-shadow:var(--neu-light),var(--neu-dark)}
+.kartu>div{
+  border:1px solid rgba(255,255,255,.25);
+  box-shadow:var(--neu-light),var(--neu-dark);
+}
+.kartu>div::before{height:0}
+.kartu span{color:var(--neu-txt-3)}
+.kartu b{color:var(--navy)}
+.kartu>div.hijau b{color:var(--ok)}
+.kartu>div.oranye b{color:var(--aksen)}
+.kartu>div.emas b{color:var(--emas)}
+
+/* ===== Tombol neumorphism ===== */
+.btn{
+  background:var(--neu-bg);
+  color:var(--navy);
+  border:1px solid rgba(255,255,255,.25);
+  border-radius:var(--neu-r-sm);
+  box-shadow:var(--neu-light),var(--neu-dark);
+  transition:all .15s ease;
+}
+.btn:hover{filter:none;box-shadow:4px 4px 10px rgba(163,177,198,.45),-4px -4px 10px rgba(255,255,255,.65)}
+.btn:active{transform:translateY(2px);box-shadow:var(--neu-inset-light),var(--neu-inset-dark)}
+
+.btn.ok{
+  color:#fff;
+  background:linear-gradient(145deg,#1A9B6D,var(--ok));
+  box-shadow:4px 4px 12px rgba(17,128,91,.35),-4px -4px 12px rgba(255,255,255,.4);
+}
+.btn.merah{
+  color:#fff;
+  background:linear-gradient(145deg,#D72E22,var(--err));
+  box-shadow:4px 4px 12px rgba(185,28,28,.35),-4px -4px 12px rgba(255,255,255,.4);
+}
+.btn.emas{
+  color:#3A250F;
+  background:linear-gradient(145deg,#D79763,var(--emas));
+  box-shadow:4px 4px 12px rgba(191,128,77,.35),-4px -4px 12px rgba(255,255,255,.4);
+}
+.btn.ghost{
+  background:var(--neu-bg);
+  color:var(--navy);
+  border:1px solid rgba(255,255,255,.25);
+}
+.btn.ghost:hover{background:var(--neu-bg-2)}
+
+/* ===== Input / select / textarea: pressed look ===== */
+input,select,textarea{
+  background:var(--neu-bg);
+  border:1px solid rgba(255,255,255,.28);
+  border-radius:var(--neu-r-sm);
+  color:var(--neu-txt);
+  box-shadow:var(--neu-inset-light),var(--neu-inset-dark);
+}
+input:hover,select:hover,textarea:hover{border-color:rgba(255,255,255,.45)}
+input:focus,select:focus,textarea:focus{
+  outline:none;
+  border-color:var(--navy-terang);
+  box-shadow:var(--neu-inset-light),var(--neu-inset-dark),0 0 0 3px rgba(46,78,140,.10);
+}
+input.besar{
+  background:var(--neu-bg);
+  box-shadow:var(--neu-inset-light),var(--neu-inset-dark);
+  color:var(--navy);
+}
+
+/* ===== Segmen jenis BBM ===== */
+.seg{
+  background:var(--neu-bg);
+  border:1px solid rgba(255,255,255,.25);
+  border-radius:var(--neu-r);
+  box-shadow:var(--neu-inset-light),var(--neu-inset-dark);
+  padding:6px;
+}
+.seg button{
+  background:transparent;
+  color:var(--neu-txt-2);
+  border-radius:10px;
+}
+.seg button.on{
+  background:var(--neu-bg);
+  color:var(--navy);
+  box-shadow:var(--neu-light),var(--neu-dark);
+}
+.seg button.on.keluar{color:var(--aksen-tua)}
+.seg button.on.masuk{color:var(--ok)}
+
+/* ===== Tombol angka cepat ===== */
+.pil-angka{
+  background:var(--neu-bg);
+  border:1px solid rgba(255,255,255,.25);
+  box-shadow:var(--neu-light),var(--neu-dark);
+  color:var(--neu-txt-2);
+}
+.pil-angka:hover{
+  background:var(--neu-bg);
+  color:var(--navy);
+  box-shadow:4px 4px 10px rgba(163,177,198,.45),-4px -4px 10px rgba(255,255,255,.65);
+}
+.pil-angka:active{box-shadow:var(--neu-inset-light),var(--neu-inset-dark)}
+
+/* ===== Tabel ===== */
+.wrap{background:var(--neu-bg);box-shadow:var(--neu-light),var(--neu-dark)}
+table th{
+  background:var(--neu-bg-2);
+  color:var(--neu-txt-2);
+  border-bottom:1px solid rgba(163,177,198,.25);
+}
+table td{border-bottom:1px solid rgba(163,177,198,.18)}
+tbody tr:nth-child(even){background:rgba(255,255,255,.25)}
+tbody tr:hover{background:rgba(255,255,255,.45)}
+tfoot td{background:rgba(255,249,237,.55)}
+.badge{background:rgba(255,255,255,.35);color:var(--navy)}
+
+/* ===== Zona unggah ===== */
+.jatuh{
+  background:var(--neu-bg);
+  border:2px dashed rgba(163,177,198,.45);
+  box-shadow:var(--neu-light),var(--neu-dark);
+}
+.jatuh:hover{
+  background:var(--neu-bg);
+  border-color:var(--navy-terang);
+}
+.jatuh .ikon{
+  background:var(--neu-bg);
+  color:var(--navy);
+  box-shadow:var(--neu-light),var(--neu-dark);
+}
+
+/* ===== Modal & pesan ===== */
+.modal{background:rgba(224,229,236,.70);backdrop-filter:blur(4px)}
+.modal .box{
+  background:var(--neu-bg);
+  box-shadow:var(--neu-light),var(--neu-dark);
+}
+.pesan{
+  background:var(--neu-bg);
+  color:var(--neu-txt);
+  box-shadow:var(--neu-light),var(--neu-dark);
+  border-left:4px solid var(--emas);
+}
+.pesan.err{color:#fff;background:var(--err)}
+
+/* ===== Halaman login ===== */
+body.masuk{background:var(--neu-bg)}
+.masuk-kotak{
+  background:var(--neu-bg);
+  box-shadow:var(--neu-light),var(--neu-dark);
+  border:1px solid rgba(255,255,255,.25);
+}
+.masuk-kotak::before{display:none}
+.masuk-kotak h1{color:var(--navy)}
+.masuk-kotak button{
+  background:linear-gradient(145deg,var(--navy-terang),var(--navy));
+  box-shadow:var(--neu-light),var(--neu-dark);
+}
+.masuk-kotak button:active{box-shadow:var(--neu-inset-light),var(--neu-inset-dark)}
+
+/* ===== Panel catatan & kosong ===== */
+.panel-catatan{background:rgba(255,252,245,.55)}
+.graf-kosong{background:rgba(255,255,255,.25);border:1px dashed rgba(163,177,198,.45)}
+.kosong{color:var(--neu-txt-3)}
+
+/* ===== Step/langkah bulat ===== */
+.panel h3 .langkah{
+  background:var(--neu-bg);
+  color:var(--navy);
+  box-shadow:var(--neu-light),var(--neu-dark);
+}
+
+/* ===== kbd ===== */
+kbd{
+  background:var(--neu-bg);
+  border:1px solid rgba(255,255,255,.25);
+  box-shadow:var(--neu-light),var(--neu-dark);
+}
+
+/* ===== Responsive tetap rapi ===== */
+@media (max-width:720px){
+  main{padding:14px}
+  .panel,.kartu>div{border-radius:var(--neu-r-sm)}
+}

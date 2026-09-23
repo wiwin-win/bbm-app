@@ -117,6 +117,31 @@ def connect() -> sqlite3.Connection:
 def init_db() -> None:
     with _LOCK, connect() as con:
         con.executescript(SCHEMA)
+        # Migrasi tabel users lama yang CHECK-nya cuma ('admin','operator')
+        try:
+            cur = con.execute("SELECT sql FROM sqlite_master WHERE type='table' AND name='users'")
+            users_sql = (cur.fetchone() or [""])[0] or ""
+        except Exception:
+            users_sql = ""
+        if "'admin','operator'" in users_sql and "'maker'" not in users_sql:
+            con.executescript("""
+                PRAGMA foreign_keys=OFF;
+                BEGIN TRANSACTION;
+                CREATE TABLE users_new (
+                  id          INTEGER PRIMARY KEY AUTOINCREMENT,
+                  username    TEXT NOT NULL UNIQUE,
+                  nama        TEXT NOT NULL DEFAULT '',
+                  role        TEXT NOT NULL CHECK (role IN ('admin','operator','maker','fuelman','watcher')) DEFAULT 'operator',
+                  pass_hash   TEXT NOT NULL,
+                  aktif       INTEGER NOT NULL DEFAULT 1,
+                  dibuat      TEXT NOT NULL
+                );
+                INSERT INTO users_new SELECT id,username,nama,role,pass_hash,aktif,dibuat FROM users;
+                DROP TABLE users;
+                ALTER TABLE users_new RENAME TO users;
+                COMMIT;
+                PRAGMA foreign_keys=ON;
+            """)
         # pangkasan (patch) fitur baru
         kol = {r["name"] for r in con.execute("PRAGMA table_info(entries)")}
         if "kunci" not in kol:

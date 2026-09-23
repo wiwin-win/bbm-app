@@ -36,6 +36,8 @@ header .mrek h1, header .mrek .sub{color:var(--navy)}
 .tema-toggle{margin-left:10px}
 header>.tema-toggle{margin-left:auto}
 .lencana.err{background:var(--err);color:#fff;box-shadow:var(--neu-light),var(--neu-dark)}
+header .plat{background:transparent;padding:0;border-radius:0}
+header .plat img{height:42px;display:block}
 
 /* Tab */
 .tab{

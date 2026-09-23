@@ -284,6 +284,12 @@ td.kini{white-space:nowrap}
   .merek h1{font-size:15px}
   header .chip{display:none}
   .kilat{grid-template-columns:1fr}
+  /* Login di HP */
+  body.masuk{padding:14px}
+  body.masuk::before{background-size:min(480px,98%) auto}
+  .masuk-kotak{max-width:100%;padding:26px 22px 22px;border-radius:17px}
+  .masuk-plat img{height:110px}
+  .masuk-kotak h1{font-size:16px}
 }
 
 /* ==========================================================================
@@ -295,17 +301,24 @@ body.masuk{
     radial-gradient(1100px 520px at 88% -12%,rgba(226,74,26,.22),transparent 62%),
     radial-gradient(900px 500px at -8% 108%,rgba(46,78,140,.55),transparent 60%),
     linear-gradient(160deg,var(--navy) 0%,var(--navy-tua) 62%,#0D1B33 100%);
-  font-family:var(--font);
+  font-family:var(--font);position:relative;
+}
+/* Logo besar di belakang form, menyatu dengan background */
+body.masuk::before{
+  content:"";position:fixed;inset:0;
+  background:url('/static/logo-login.jpg') no-repeat center center;
+  background-size:min(720px,95%) auto;opacity:.08;pointer-events:none;z-index:0
 }
 .masuk-kotak{
-  background:#fff;border-radius:19px;width:100%;max-width:380px;padding:30px 28px 26px;
+  background:rgba(255,255,255,.96);border-radius:19px;width:100%;max-width:420px;padding:34px 32px 28px;
   box-shadow:0 30px 70px -24px rgba(0,0,0,.55),0 0 0 1px rgba(255,255,255,.06);
-  position:relative;overflow:hidden;box-sizing:border-box;
+  position:relative;overflow:hidden;box-sizing:border-box;z-index:1;
+  backdrop-filter:blur(2px)
 }
 .masuk-kotak::before{content:"";position:absolute;inset:0 0 auto 0;height:4px;
   background:linear-gradient(90deg,var(--aksen),var(--emas),var(--navy))}
-.masuk-plat{display:flex;justify-content:center;margin:2px 0 16px}
-.masuk-plat img{height:48px;display:block}
+.masuk-plat{display:flex;justify-content:center;margin:2px 0 18px}
+.masuk-plat img{height:130px;display:block;max-width:100%;object-fit:contain}
 .masuk-kotak h1{font-size:17px;margin:0 0 4px;color:var(--navy);text-align:center;letter-spacing:-.01em}
 .masuk-kotak .sub{text-align:center;color:var(--txt-2);font-size:11.5px;margin:0 0 24px;
   text-transform:uppercase;letter-spacing:.14em}

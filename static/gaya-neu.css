@@ -38,10 +38,13 @@ header .chip{white-space:nowrap}
 .tema-toggle{flex-shrink:0}
 header::after{display:none}
 .merek .plat{
-  background:var(--neu-bg);
+  background:transparent;
   border:0;
-  box-shadow:var(--neu-light),var(--neu-dark);
+  box-shadow:none;
+  padding:0;
+  display:flex;align-items:center
 }
+.merek .plat img{height:42px;display:block}
 .merek h1, .merek .instansi, .merek .sub{color:var(--navy)}
 .chip{
   background:var(--neu-bg);
@@ -294,6 +297,7 @@ body.masuk{background:var(--neu-bg)}
 }
 .masuk-kotak::before{display:none}
 .masuk-kotak h1{color:var(--navy)}
+.masuk-plat img{height:210px;max-width:100%;object-fit:contain}
 .masuk-kotak button{
   background:linear-gradient(145deg,var(--navy-terang),var(--navy));
   box-shadow:var(--neu-light),var(--neu-dark);
@@ -323,4 +327,7 @@ kbd{
 @media (max-width:720px){
   main{padding:14px}
   .panel,.kartu>div{border-radius:var(--neu-r-sm)}
+  /* Login di HP */
+  .masuk-kotak{padding:26px 22px 22px;max-width:100%}
+  .masuk-plat img{height:160px}
 }

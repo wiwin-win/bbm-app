@@ -355,11 +355,17 @@ def api_unduh_mandiri(request: Request):
     skrip = (STATIC / "xlsx.js").read_text(encoding="utf-8")
     gaya = (STATIC / "gaya-hp.css").read_text(encoding="utf-8")
     import base64
-    logo_b64 = base64.b64encode((STATIC / "logo-hp-custom.png").read_bytes()).decode()
+    logo_b64 = base64.b64encode((STATIC / "logo-header-hp.png").read_bytes()).decode()
     fav_b64 = base64.b64encode((STATIC / "icon-192.png").read_bytes()).decode()
+    def inline_logo(txt: str) -> str:
+        return txt.replace("/static/logo.png", f"data:image/png;base64,{logo_b64}") \
+                  .replace("/static/logo-header-hp.png", f"data:image/png;base64,{logo_b64}") \
+                  .replace("/static/logo-login.png", f"data:image/png;base64,{logo_b64}") \
+                  .replace("/static/logo-header-pc.png", f"data:image/png;base64,{logo_b64}")
+
     aset = {
         '<link rel="stylesheet" href="/static/gaya-hp.css"><link rel="stylesheet" href="/static/gaya-hp-neu.css">':
-            "<style>\n" + (gaya + "\n" + (STATIC / "gaya-hp-neu.css").read_text(encoding="utf-8")).replace("/static/logo.png", f"data:image/png;base64,{logo_b64}") + "\n</style>",
+            "<style>\n" + inline_logo(gaya + "\n" + (STATIC / "gaya-hp-neu.css").read_text(encoding="utf-8")) + "\n</style>",
         '<link rel="manifest" href="/manifest.webmanifest">': "",
         '<link rel="icon" href="/static/favicon.ico" sizes="any">':
             f'<link rel="icon" href="data:image/png;base64,{fav_b64}">',
@@ -372,7 +378,7 @@ def api_unduh_mandiri(request: Request):
     for a, b in aset.items():
         html = html.replace(a, b)
     # logo di dalam HTML (kalau ada tag img) juga di-inline
-    html = html.replace('src="/static/logo.png"', f'src="data:image/png;base64,{logo_b64}"')
+    html = inline_logo(html)
     nama = "bbm-hp-mandiri.html"
     return Response(content=html, media_type="text/html; charset=utf-8",
                     headers={"Content-Disposition": f'attachment; filename="{nama}"'})

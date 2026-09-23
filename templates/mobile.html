@@ -7,11 +7,10 @@
 <link rel="manifest" href="/manifest.webmanifest">
 <link rel="icon" href="/static/favicon.ico" sizes="any">
 <link rel="apple-touch-icon" href="/static/icon-192.png">
-<meta name="theme-color" content="#1F3864">
+<meta name="theme-color" content="#E0E5EC" id="themeColor">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<link rel="stylesheet" href="/static/gaya-hp.css">
-<link rel="stylesheet" href="/static/gaya-hp-neu.css">
+<link rel="stylesheet" href="/static/gaya-hp.css"><link rel="stylesheet" href="/static/gaya-hp-neu.css">
 </head>
 <body>
 <header>
@@ -20,6 +19,7 @@
     <h1 id="hJudul">INPUT BBM / SOLAR</h1>
     <div class="sub" id="hSub">-</div>
   </div>
+  <span class="tema-toggle" id="temaToggle" onclick="toggleTema()" title="Ganti tema"></span>
   <div class="kanan" id="hLencana"></div>
 </header>
 <div class="tab"><a class="aktif" data-t="in">Input</a><a data-t="data">Data</a><a data-t="rek">Rekap</a><a data-t="xl">Excel</a><a data-t="set">Siapkan</a></div>
@@ -563,6 +563,20 @@ document.querySelectorAll('.tab a').forEach(a=>a.onclick=()=>{
 });
 
 ['iLiter','iHarga'].forEach(i => $(i).addEventListener('input', hitungNilai));
+
+function setTema(gelap){
+  document.body.classList.toggle('gelap', gelap);
+  const el = $('temaToggle'); if(el) el.classList.toggle('gelap', gelap);
+  const tc = document.querySelector('meta[name=theme-color]');
+  if(tc) tc.content = gelap ? '#1F2329' : '#E0E5EC';
+  localStorage.setItem('bbm-tema', gelap ? 'gelap' : 'terang');
+}
+function toggleTema(){ setTema(!document.body.classList.contains('gelap')); }
+(function temaInit(){
+  const saved = localStorage.getItem('bbm-tema');
+  const gelap = saved ? saved==='gelap' : false;
+  setTema(gelap);
+})();
 
 (async function(){
   const t=new Date(); t.setDate(1); $('mBulan').value=t.toISOString().slice(0,7);

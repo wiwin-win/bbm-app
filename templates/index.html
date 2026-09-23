@@ -8,7 +8,7 @@
 <link rel="icon" href="/static/favicon.ico" sizes="any">
 <link rel="icon" type="image/png" href="/static/icon-192.png">
 <link rel="apple-touch-icon" href="/static/icon-192.png">
-<meta name="theme-color" content="#1F3864">
+<meta name="theme-color" content="#E0E5EC" id="themeColor">
 <link rel="stylesheet" href="/static/gaya.css">
 <link rel="stylesheet" href="/static/gaya-neu.css">
 </head>
@@ -26,6 +26,7 @@
   <span class="chip garis"><span class="k">Sisa stok</span><b id="chipStok">-</b></span>
   <span class="chip"><span class="k">Bulan ini</span><b id="chipBulan">-</b> L</span>
   <span class="chip" id="chipUser">-</span>
+  <span class="tema-toggle" id="temaToggle" onclick="toggleTema()" title="Ganti tema"></span>
 </header>
 
 <nav>
@@ -740,6 +741,21 @@ function tutup(){ $('modal').classList.remove('buka'); }
 $('modal').onclick = e => { if(e.target.id==='modal') tutup(); };
 function bukaPengaturan(){ pindahTab('admin'); }
 function keluar(){ api('/api/logout',{method:'POST'}).then(()=>location.href='/login'); }
+
+/* ---------- tema gelap / terang ---------- */
+function setTema(gelap){
+  document.body.classList.toggle('gelap', gelap);
+  const t = $('temaToggle'); if(t) t.classList.toggle('gelap', gelap);
+  const tc = document.querySelector('meta[name=theme-color]');
+  if(tc) tc.content = gelap ? '#1F2329' : '#E0E5EC';
+  localStorage.setItem('bbm-tema', gelap ? 'gelap' : 'terang');
+}
+function toggleTema(){ setTema(!document.body.classList.contains('gelap')); }
+(function temaInit(){
+  const saved = localStorage.getItem('bbm-tema');
+  const gelap = saved ? saved==='gelap' : false;
+  setTema(gelap);
+})();
 
 /* ---------- pintasan keyboard ---------- */
 document.addEventListener('keydown', e => {

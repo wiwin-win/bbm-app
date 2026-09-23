@@ -106,6 +106,11 @@ def halaman_login(request: Request, m: int = 0):
     return _html("login.html", request, kembali=kembali)
 
 
+@app.get("/healthz")
+def healthz():
+    return {"ok": True}
+
+
 @app.post("/api/login")
 def api_login(request: Request, username: str = Form(...), password: str = Form(...)):
     u = db.find_user(username)
@@ -325,11 +330,11 @@ def api_unduh_mandiri(request: Request):
     skrip = (STATIC / "xlsx.js").read_text(encoding="utf-8")
     gaya = (STATIC / "gaya-hp.css").read_text(encoding="utf-8")
     import base64
-    logo_b64 = base64.b64encode((STATIC / "logo.png").read_bytes()).decode()
+    logo_b64 = base64.b64encode((STATIC / "logo-hp-custom.png").read_bytes()).decode()
     fav_b64 = base64.b64encode((STATIC / "icon-192.png").read_bytes()).decode()
     aset = {
-        '<link rel="stylesheet" href="/static/gaya-hp.css">':
-            "<style>\n" + gaya.replace("/static/logo.png", f"data:image/png;base64,{logo_b64}") + "\n</style>",
+        '<link rel="stylesheet" href="/static/gaya-hp.css"><link rel="stylesheet" href="/static/gaya-hp-neu.css">':
+            "<style>\n" + (gaya + "\n" + (STATIC / "gaya-hp-neu.css").read_text(encoding="utf-8")).replace("/static/logo.png", f"data:image/png;base64,{logo_b64}") + "\n</style>",
         '<link rel="manifest" href="/manifest.webmanifest">': "",
         '<link rel="icon" href="/static/favicon.ico" sizes="any">':
             f'<link rel="icon" href="data:image/png;base64,{fav_b64}">',

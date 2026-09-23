@@ -19,17 +19,23 @@
 
 body{background:var(--neu-bg);color:var(--neu-txt)}
 
-/* Header gelap tetap, tapi logo dibuat soft */
+/* Header menyatu dengan latar app */
 header{
-  background:linear-gradient(145deg,#1c3358,#162a4d);
-  box-shadow:0 8px 18px rgba(22,42,77,.32), inset 0 1px 0 rgba(255,255,255,.1);
+  background:var(--neu-bg);
+  box-shadow:var(--neu-light),var(--neu-dark);
+  border-bottom:1px solid rgba(255,255,255,.35);
+  color:var(--neu-txt)
 }
 header .plat{
   background:var(--neu-bg);
   border:0;
   box-shadow:var(--neu-light),var(--neu-dark);
 }
-.lencana{background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.18)}
+header .mrek h1, header .mrek .sub{color:var(--navy)}
+.lencana{background:var(--neu-bg);border:1px solid rgba(255,255,255,.25);box-shadow:var(--neu-light),var(--neu-dark);color:var(--neu-txt)}
+.tema-toggle{margin-left:10px}
+header>.tema-toggle{margin-left:auto}
+.lencana.err{background:var(--err);color:#fff;box-shadow:var(--neu-light),var(--neu-dark)}
 
 /* Tab */
 .tab{
@@ -115,6 +121,11 @@ input.besar{
   border-top:1px solid rgba(255,255,255,.35);
   box-shadow:0 -8px 18px -12px rgba(163,177,198,.55);
 }
+body.gelap .aksi{
+  background:rgba(31,35,41,.96);
+  border-top-color:rgba(255,255,255,.06);
+  box-shadow:0 -8px 18px -12px rgba(0,0,0,.55)
+}
 
 /* Kartu & item */
 .kartu>div,.item{
@@ -143,6 +154,49 @@ input.besar{
   background:linear-gradient(145deg,var(--navy-terang),var(--navy));
   color:#fff;
   box-shadow:var(--neu-light),var(--neu-dark);
+}
+
+/* Toggle tema */
+.tema-toggle{
+  width:42px;height:24px;border-radius:999px;
+  background:var(--neu-bg);border:1px solid rgba(255,255,255,.25);
+  box-shadow:var(--neu-inset-light),var(--neu-inset-dark);
+  position:relative;cursor:pointer;transition:.2s;flex-shrink:0
+}
+.tema-toggle::after{
+  content:"";position:absolute;top:2px;left:2px;width:18px;height:18px;border-radius:50%;
+  background:linear-gradient(145deg,var(--navy-terang),var(--navy));
+  box-shadow:var(--neu-light),var(--neu-dark);transition:.2s
+}
+.tema-toggle.gelap::after{left:20px}
+.tema-toggle::before{
+  content:"☀";position:absolute;left:5px;top:2px;font-size:12px;color:var(--neu-txt-2)
+}
+.tema-toggle.gelap::before{content:"☾";left:auto;right:5px;color:#fff}
+
+/* Mode gelap */
+body.gelap{
+  --neu-bg:#1F2329;
+  --neu-bg-2:#272C35;
+  --neu-txt:#E8ECF1;
+  --neu-txt-2:#A9B4C2;
+  --neu-txt-3:#6E7A8A;
+  --neu-light:-6px -6px 14px rgba(60,68,78,.45);
+  --neu-dark: 6px 6px 14px rgba(0,0,0,.5);
+  --neu-inset-light:inset -4px -4px 8px rgba(60,68,78,.35);
+  --neu-inset-dark:inset 4px 4px 8px rgba(0,0,0,.45);
+  background:var(--neu-bg);color:var(--neu-txt)
+}
+body.gelap header{background:var(--neu-bg);box-shadow:var(--neu-light),var(--neu-dark);border-bottom-color:rgba(255,255,255,.06)}
+body.gelap header .mrek h1, body.gelap header .mrek .sub{color:var(--neu-txt)}
+body.gelap .tab{background:var(--neu-bg);border-bottom-color:rgba(255,255,255,.06)}
+body.gelap .tab a{color:var(--neu-txt-2)}
+body.gelap .tab a.aktif{background:var(--neu-bg);color:var(--navy);box-shadow:var(--neu-light),var(--neu-dark)}
+body.gelap .form, body.gelap .kartu, body.gelap .panel, body.gelap .daftar, body.gelap .pesan{
+  background:var(--neu-bg);color:var(--neu-txt)
+}
+body.gelap .bidang, body.gelap input, body.gelap select, body.gelap textarea{
+  background:var(--neu-bg);color:var(--neu-txt)
 }
 
 /* Pesan toast */

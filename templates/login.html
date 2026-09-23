@@ -6,9 +6,10 @@
 <link rel="apple-touch-icon" href="/static/icon-192.png">
 <link rel="stylesheet" href="/static/gaya.css">
 <link rel="stylesheet" href="/static/gaya-neu.css">
-<meta name="theme-color" content="#1F3864">
+<meta name="theme-color" content="#E0E5EC" id="themeColor">
 </head><body class="masuk">
 <form class="masuk-kotak" onsubmit="return masuk(event)">
+<span class="tema-toggle" id="temaToggle" onclick="toggleTema()" title="Ganti tema" style="position:absolute;top:16px;right:16px"></span>
   <div class="masuk-plat"><img src="/static/logo.png" alt="PT Gembira Anggun Setia"></div>
   <h1 id="judul">Monitoring BBM &amp; Alat</h1>
   <p class="sub">Pencatatan BBM / Solar</p>
@@ -33,5 +34,17 @@ async function masuk(ev){
   }catch(e){ er.textContent = e.message; er.style.display='block'; $('p').select(); }
 }
 if(new URLSearchParams(location.search).get('m')) $('judul').textContent = 'Input BBM (HP)';
+function setTema(gelap){
+  document.body.classList.toggle('gelap', gelap);
+  const t = $('temaToggle'); if(t) t.classList.toggle('gelap', gelap);
+  const tc = $('themeColor'); if(tc) tc.content = gelap ? '#1F2329' : '#E0E5EC';
+  localStorage.setItem('bbm-tema', gelap ? 'gelap' : 'terang');
+}
+function toggleTema(){ setTema(!document.body.classList.contains('gelap')); }
+(function temaInit(){
+  const saved = localStorage.getItem('bbm-tema');
+  const gelap = saved ? saved==='gelap' : false;
+  setTema(gelap);
+})();
 </script>
 </body></html>

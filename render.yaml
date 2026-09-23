@@ -8,10 +8,12 @@ services:
     startCommand: uvicorn app:app --host 0.0.0.0 --port $PORT
     envVars:
       - key: PYTHON_VERSION
-        value: "3.11.0"
-      - key: BBM_DB
-        value: /opt/render/project/src/bbm.db
+        value: 3.11.0
+      - key: BBM_HOST
+        value: 0.0.0.0
+      - key: BBM_PORT
+        value: 10000
       - key: BBM_SEED
-        value: "1"
-      - key: BBM_HAPUS_BEBAS
-        value: "0"
+        value: 1
+      - key: BBM_DB
+        value: /tmp/bbm.db

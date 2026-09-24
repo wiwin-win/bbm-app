@@ -1,5 +1,5 @@
 /* Service worker: simpan shell aplikasi supaya /m tetap terbuka tanpa sinyal. */
-const CACHE = "bbm-v3";
+const CACHE = "bbm-v4";
 const SHELL = [
   "/m", "/login", "/static/gaya-hp.css", "/static/xlsx.js",
   "/static/logo.png", "/static/icon-192.png",

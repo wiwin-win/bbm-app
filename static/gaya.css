@@ -306,7 +306,7 @@ body.masuk{
 /* Logo besar di belakang form, menyatu dengan background */
 body.masuk::before{
   content:"";position:fixed;inset:0;
-  background:url('/static/logo-login.jpg') no-repeat center center;
+  background:url('/static/logo-login.png') no-repeat center center;
   background-size:min(720px,95%) auto;opacity:.08;pointer-events:none;z-index:0
 }
 .masuk-kotak{

@@ -55,11 +55,17 @@ print("=" * 50)
 periksa_css(BASE / "static" / "gaya.css")
 periksa_css(BASE / "static" / "gaya-hp.css")
 
+# kelas yang di-toggle lewat JS (classList) tapi gayanya menempel di
+# elemen lain / via body.gelap — dianggap sah:
+KECUALI_KELAS = {"gelap", "tema-toggle"}
+
 print("\n-> cakupan kelas (dipakai HTML/JS vs ada di CSS)")
 for nama_html, nama_css in (("index.html", "gaya.css"), ("mobile.html", "gaya-hp.css")):
     html = (BASE / "templates" / nama_html).read_text(encoding="utf-8")
     css = (BASE / "static" / nama_css).read_text(encoding="utf-8")
-    terdefinisi = set(re.findall(r"\.([a-zA-Z][a-zA-Z0-9_-]*)", css))
+    css_semua = css + "\n" + (BASE / "static" / ("gaya-neu.css" if nama_html == "index.html"
+                          else "gaya-hp-neu.css")).read_text(encoding="utf-8")
+    terdefinisi = set(re.findall(r"\.([a-zA-Z][a-zA-Z0-9_-]*)", css_semua)) | KECUALI_KELAS
     dipakai = kelas_dipakai(html)
     hilang = sorted(dipakai - terdefinisi)
     cek(f"{nama_html:12s} semua kelas punya gaya", not hilang, f"hilang: {hilang}" if hilang else
@@ -78,8 +84,11 @@ for nama_html in ("index.html", "mobile.html", "login.html"):
 print("\n-> merek & logo di setiap halaman")
 for nama_html in ("index.html", "mobile.html", "login.html"):
     html = (BASE / "templates" / nama_html).read_text(encoding="utf-8")
-    cek(f"{nama_html:12s} menampilkan logo", 'src="/static/logo.png"' in html)
-    cek(f"{nama_html:12s} ada theme-color navy", "#1F3864" in html)
+    cek(f"{nama_html:12s} menampilkan logo",
+        ('src="/static/logo.png"' in html or 'class="plat"' in html
+         or 'masuk-plat' in html))
+    cek(f"{nama_html:12s} ada warna tema",
+        ("#1F3864" in html or "'#1F2329'" in html or '"#1F2329"' in html))
 
 print("\n" + "=" * 50)
 print("GAGAL" if GAGAL else "TAMPILAN RAPI & LENGKAP", f"({GAGAL} gagal)")

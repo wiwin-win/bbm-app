@@ -569,6 +569,8 @@ function setTema(gelap){
   const el = $('temaToggle'); if(el) el.classList.toggle('gelap', gelap);
   const tc = document.querySelector('meta[name=theme-color]');
   if(tc) tc.content = gelap ? '#1F2329' : '#E0E5EC';
+  const lg = document.querySelector('.plat img');
+  if(lg) lg.src = gelap ? '/static/logo-header-hp-gelap.png' : '/static/logo-header-hp.png';
   localStorage.setItem('bbm-tema', gelap ? 'gelap' : 'terang');
 }
 function toggleTema(){ setTema(!document.body.classList.contains('gelap')); }

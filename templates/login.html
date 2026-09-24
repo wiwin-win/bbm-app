@@ -10,7 +10,7 @@
 </head><body class="masuk">
 <form class="masuk-kotak" onsubmit="return masuk(event)">
 <span class="tema-toggle" id="temaToggle" onclick="toggleTema()" title="Ganti tema" style="position:absolute;top:16px;right:16px"></span>
-  <div class="masuk-plat"><img src="/static/logo-login.jpg" alt="PT Gembira Anggun Setia"></div>
+  <div class="masuk-plat"><img src="/static/logo-login.png" alt="PT Gembira Anggun Setia"></div>
   <h1 id="judul">Monitoring BBM &amp; Alat</h1>
   <p class="sub">Pencatatan BBM / Solar</p>
   <div class="masuk-err" id="eri"></div>
@@ -38,6 +38,8 @@ function setTema(gelap){
   document.body.classList.toggle('gelap', gelap);
   const t = $('temaToggle'); if(t) t.classList.toggle('gelap', gelap);
   const tc = $('themeColor'); if(tc) tc.content = gelap ? '#1F2329' : '#E0E5EC';
+  const lg = document.querySelector('.masuk-plat img');
+  if(lg) lg.src = gelap ? '/static/logo-login-gelap.png' : '/static/logo-login.png';
   localStorage.setItem('bbm-tema', gelap ? 'gelap' : 'terang');
 }
 function toggleTema(){ setTema(!document.body.classList.contains('gelap')); }

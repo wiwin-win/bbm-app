@@ -356,12 +356,15 @@ def api_unduh_mandiri(request: Request):
     gaya = (STATIC / "gaya-hp.css").read_text(encoding="utf-8")
     import base64
     logo_b64 = base64.b64encode((STATIC / "logo-header-hp.png").read_bytes()).decode()
+    logo_gelap_b64 = base64.b64encode(
+        (STATIC / "logo-header-hp-gelap.png").read_bytes()).decode()
     fav_b64 = base64.b64encode((STATIC / "icon-192.png").read_bytes()).decode()
     def inline_logo(txt: str) -> str:
         return txt.replace("/static/logo.png", f"data:image/png;base64,{logo_b64}") \
                   .replace("/static/logo-header-hp.png", f"data:image/png;base64,{logo_b64}") \
                   .replace("/static/logo-login.png", f"data:image/png;base64,{logo_b64}") \
-                  .replace("/static/logo-header-pc.png", f"data:image/png;base64,{logo_b64}")
+                  .replace("/static/logo-header-pc.png", f"data:image/png;base64,{logo_b64}") \
+                  .replace("/static/logo-header-hp-gelap.png", f"data:image/png;base64,{logo_gelap_b64}")
 
     aset = {
         '<link rel="stylesheet" href="/static/gaya-hp.css"><link rel="stylesheet" href="/static/gaya-hp-neu.css">':

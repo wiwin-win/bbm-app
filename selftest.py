@@ -301,7 +301,7 @@ def main() -> int:
     dipanggil = set(re.findall(r"onclick=\"([A-Za-z0-9_]+)\(", mob))
     cek("semua onclick punya fungsinya", not (dipanggil - fungsi),
         f"tak terdefinisi: {sorted(dipanggil - fungsi)}")
-    cek("sw.js rajin (cache baru + fallback offline)", "bbm-v3" in pathlib.Path(
+    cek("sw.js rajin (cache baru + fallback offline)", "bbm-v4" in pathlib.Path(
         BASE / "static" / "sw.js").read_text(encoding="utf-8"))
     cek("manifest start_url /m", '"start_url": "/m"' in pathlib.Path(
         BASE / "static" / "manifest.webmanifest").read_text(encoding="utf-8"))
